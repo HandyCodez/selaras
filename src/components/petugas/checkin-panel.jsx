@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, startTransition } from "react";
 import { checkinDonor } from "@/actions/partisipasi.actions";
 import { QrScanner } from "@/components/qr/qr-scanner";
 import {
@@ -23,7 +23,9 @@ export function CheckinPanel({ kegiatanList }) {
     const fd = new FormData();
     fd.set("qrPayload", qrPayload);
     fd.set("kegiatanId", kegiatanId);
-    formAction(fd);
+    startTransition(() => {
+      formAction(fd);
+    });
   }
 
   return (

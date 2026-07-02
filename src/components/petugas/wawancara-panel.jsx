@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, startTransition } from "react";
 import { findPartisipasiForWawancara } from "@/actions/partisipasi.actions";
 import { QrScanner } from "@/components/qr/qr-scanner";
 import { WawancaraForm } from "@/components/forms/wawancara-form";
@@ -29,7 +29,9 @@ export function WawancaraPanel({ kegiatanList }) {
     const fd = new FormData();
     fd.set("qrPayload", qrPayload);
     fd.set("kegiatanId", kegiatanId);
-    formAction(fd);
+    startTransition(() => {
+      formAction(fd);
+    });
   }
 
   if (state?.success && state.partisipasi && !done) {
