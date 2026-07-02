@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { connectDB } from "@/lib/db";
 import { Partisipasi, Kegiatan, User } from "@/lib/models";
-import { requireRole, requireJabatan } from "@/lib/auth";
+import { requireRole } from "@/lib/auth";
 import { verifyDonorQrPayload } from "@/lib/qr";
 import { adjustStokDarah } from "@/actions/stok.actions";
 import { GOLONGAN_DARAH } from "@/lib/blood-types";
@@ -161,7 +161,7 @@ const scanForWawancaraSchema = z.object({
 });
 
 export async function findPartisipasiForWawancara(prevState, formData) {
-  await requireJabatan("dokter");
+  await requireRole("petugas");
   const parsed = scanForWawancaraSchema.safeParse(Object.fromEntries(formData.entries()));
   if (!parsed.success) {
     return { error: "Data tidak valid." };
@@ -202,7 +202,7 @@ const wawancaraSchema = z.object({
 });
 
 export async function submitWawancara(partisipasiId, prevState, formData) {
-  const session = await requireJabatan("dokter");
+  const session = await requireRole("petugas");
   const parsed = wawancaraSchema.safeParse(Object.fromEntries(formData.entries()));
   if (!parsed.success) {
     return { error: "Data wawancara tidak lengkap atau tidak valid." };

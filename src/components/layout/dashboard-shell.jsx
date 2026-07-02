@@ -4,7 +4,7 @@ import { useState } from "react";
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { DashboardTopbar } from "@/components/layout/dashboard-topbar";
 
-export function DashboardShell({ role, jabatan, nama, children }) {
+export function DashboardShell({ role, nama, children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -24,7 +24,6 @@ export function DashboardShell({ role, jabatan, nama, children }) {
         )}
         <DashboardSidebar
           role={role}
-          jabatan={jabatan}
           open={sidebarOpen}
           onNavigate={() => setSidebarOpen(false)}
         />

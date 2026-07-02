@@ -1,10 +1,10 @@
-import { requireJabatan } from "@/lib/auth";
+import { requireRole } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Kegiatan } from "@/lib/models";
 import { WawancaraPanel } from "@/components/petugas/wawancara-panel";
 
 export default async function WawancaraPage() {
-  const session = await requireJabatan("dokter");
+  const session = await requireRole("petugas");
   await connectDB();
   const kegiatanList = JSON.parse(
     JSON.stringify(

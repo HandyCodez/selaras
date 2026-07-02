@@ -16,8 +16,8 @@ if (!MONGODB_URI) {
 }
 
 const CABANG_DATA = [
-  { nama: "PMI Cabang Jakarta Pusat", kota: "Jakarta Pusat" },
-  { nama: "PMI Cabang Bandung", kota: "Bandung" },
+  { nama: "PMI Cabang Samarinda", kota: "Samarinda" },
+  { nama: "PMI Cabang Bontang", kota: "Bontang" },
 ];
 
 async function upsertPetugas({ nama, email, cabangId, jabatan }) {

@@ -5,7 +5,7 @@ import { connectDB } from "@/lib/db";
 import { User } from "@/lib/models";
 
 // Server-only data-access layer. Proxy only checks "is logged in" — this is
-// where real role/jabatan authorization happens, in every page and action.
+// where real role authorization happens, in every page and action.
 export const getSession = cache(async function getSession() {
   const payload = await readSessionCookie();
   if (!payload) return null;
@@ -35,14 +35,6 @@ export async function requireAuth() {
 export async function requireRole(...roles) {
   const session = await requireAuth();
   if (!roles.includes(session.role)) {
-    redirect("/dashboard");
-  }
-  return session;
-}
-
-export async function requireJabatan(jabatan) {
-  const session = await requireRole("petugas");
-  if (session.jabatan !== jabatan) {
     redirect("/dashboard");
   }
   return session;

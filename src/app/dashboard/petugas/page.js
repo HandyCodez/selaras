@@ -1,10 +1,9 @@
-import { getSession, getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Kegiatan, PermintaanDarah, StokDarah } from "@/lib/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function PetugasHomePage() {
-  const session = await getSession();
   const user = await getCurrentUser();
   await connectDB();
 
@@ -22,9 +21,7 @@ export default async function PetugasHomePage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Halo, {user.nama}</h1>
-        <p className="text-muted-foreground">
-          {session.jabatan === "dokter" ? "Dokter" : "Petugas"} PMI
-        </p>
+        <p className="text-muted-foreground">Petugas PMI</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-3">
         <Card>

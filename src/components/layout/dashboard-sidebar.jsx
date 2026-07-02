@@ -5,11 +5,9 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { NAV_ITEMS } from "@/components/layout/role-nav-items";
 
-export function DashboardSidebar({ role, jabatan, open, onNavigate }) {
+export function DashboardSidebar({ role, open, onNavigate }) {
   const pathname = usePathname();
-  const items = (NAV_ITEMS[role] || []).filter(
-    (item) => !item.dokterOnly || jabatan === "dokter",
-  );
+  const items = NAV_ITEMS[role] || [];
 
   return (
     <nav
