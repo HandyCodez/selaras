@@ -36,6 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# uploaded content (local disk storage for berita cover images)
+/public/uploads/berita/*
+!/public/uploads/berita/.gitkeep
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
