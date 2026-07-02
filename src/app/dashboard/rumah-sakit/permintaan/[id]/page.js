@@ -16,6 +16,11 @@ import { StatusBadge } from "@/components/shared/status-badge";
 export default async function RumahSakitPermintaanDetailPage({ params }) {
   const { id } = await params;
   const user = await requireCurrentUser();
+  if (!user.rumahSakit?.rumahSakitId) {
+    // Cookies can't be cleared from a Server Component render — throw so
+    // dashboard/error.js (a Client Component) can log the user out properly.
+    throw new Error("Data akun rumah sakit tidak lengkap.");
+  }
   await connectDB();
 
   const permintaan = await PermintaanDarah.findOne({

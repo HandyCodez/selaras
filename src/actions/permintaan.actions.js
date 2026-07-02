@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { PermintaanDarah, User } from "@/lib/models";
 import { requireRole } from "@/lib/auth";
+import { logout } from "@/actions/auth.actions";
 import { adjustStokDarah } from "@/actions/stok.actions";
 import { GOLONGAN_DARAH } from "@/lib/blood-types";
 
@@ -35,6 +36,9 @@ export async function createPermintaan(prevState, formData) {
 
   await connectDB();
   const user = await User.findById(session.userId).lean();
+  if (!user?.rumahSakit?.rumahSakitId) {
+    await logout();
+  }
 
   const permintaan = await PermintaanDarah.create({
     rumahSakitId: user.rumahSakit.rumahSakitId,

@@ -16,6 +16,11 @@ import { PlusIcon } from "lucide-react";
 
 export default async function RumahSakitPermintaanPage() {
   const user = await requireCurrentUser();
+  if (!user.rumahSakit?.rumahSakitId) {
+    // Cookies can't be cleared from a Server Component render — throw so
+    // dashboard/error.js (a Client Component) can log the user out properly.
+    throw new Error("Data akun rumah sakit tidak lengkap.");
+  }
   await connectDB();
   const permintaanList = await PermintaanDarah.find({
     rumahSakitId: user.rumahSakit.rumahSakitId,
