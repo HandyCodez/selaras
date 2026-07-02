@@ -24,6 +24,17 @@ export async function getCurrentUser() {
   return User.findById(session.userId).lean();
 }
 
+// Use in pages that read fields off the current user without a null check —
+// the session cookie can be valid while the underlying User document is
+// gone (e.g. deleted account), which getCurrentUser() surfaces as null.
+export async function requireCurrentUser() {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/login");
+  }
+  return user;
+}
+
 export async function requireAuth() {
   const session = await getSession();
   if (!session) {

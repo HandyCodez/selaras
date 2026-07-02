@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/auth";
+import { requireCurrentUser } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { RumahSakit } from "@/lib/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,7 @@ function Field({ label, value }) {
 }
 
 export default async function RumahSakitAkunPage() {
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser();
   await connectDB();
   const rumahSakit = await RumahSakit.findById(
     user.rumahSakit?.rumahSakitId,

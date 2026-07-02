@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/auth";
+import { requireCurrentUser } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { PmiCabang } from "@/lib/models";
 import { getStokByCabang } from "@/actions/stok.actions";
@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 export default async function RumahSakitStokPage({ searchParams }) {
   const { cabangId } = await searchParams;
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser();
   await connectDB();
 
   const cabangList = await PmiCabang.find({ isActive: true }).sort({ nama: 1 }).lean();

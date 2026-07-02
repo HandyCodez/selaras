@@ -1,10 +1,10 @@
-import { getCurrentUser } from "@/lib/auth";
+import { requireCurrentUser } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Kegiatan, PermintaanDarah, StokDarah } from "@/lib/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function PetugasHomePage() {
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser();
   await connectDB();
 
   const cabangId = user.petugas?.cabangId;

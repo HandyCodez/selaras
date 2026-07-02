@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/auth";
+import { requireCurrentUser } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DonorQrDisplay } from "@/components/qr/donor-qr-display";
 
@@ -12,7 +12,7 @@ function Field({ label, value }) {
 }
 
 export default async function PendonorAkunPage() {
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser();
 
   return (
     <div className="grid max-w-3xl gap-6 sm:grid-cols-2">

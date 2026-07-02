@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/auth";
+import { requireCurrentUser } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { PermintaanDarah } from "@/lib/models";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { PlusIcon } from "lucide-react";
 
 export default async function RumahSakitPermintaanPage() {
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser();
   await connectDB();
   const permintaanList = await PermintaanDarah.find({
     rumahSakitId: user.rumahSakit.rumahSakitId,

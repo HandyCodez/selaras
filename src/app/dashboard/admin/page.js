@@ -1,10 +1,10 @@
-import { getCurrentUser } from "@/lib/auth";
+import { requireCurrentUser } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { PmiCabang, User } from "@/lib/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function AdminHomePage() {
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser();
   await connectDB();
 
   const [totalCabang, totalPetugas] = await Promise.all([

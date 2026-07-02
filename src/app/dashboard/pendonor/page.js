@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { getCurrentUser } from "@/lib/auth";
+import { requireCurrentUser } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Partisipasi } from "@/lib/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export default async function PendonorHomePage() {
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser();
   await connectDB();
   const totalDonor = await Partisipasi.countDocuments({
     donorId: user._id,

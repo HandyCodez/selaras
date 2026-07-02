@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth";
+import { requireCurrentUser } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { PermintaanDarah } from "@/lib/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +15,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 
 export default async function RumahSakitPermintaanDetailPage({ params }) {
   const { id } = await params;
-  const user = await getCurrentUser();
+  const user = await requireCurrentUser();
   await connectDB();
 
   const permintaan = await PermintaanDarah.findOne({
