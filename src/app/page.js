@@ -13,7 +13,7 @@ export default function Home() {
           sakit untuk mempermudah proses donor darah.
         </p>
       </div>
-      <div className="flex gap-3">
+      <div className="flex w-full max-w-xs flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row">
         <Button render={<Link href="/register" />} size="lg">
           Daftar Sekarang
         </Button>

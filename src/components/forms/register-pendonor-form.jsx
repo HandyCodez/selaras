@@ -35,7 +35,7 @@ export function RegisterPendonorForm() {
         <Label htmlFor="telepon">No. Telepon</Label>
         <Input id="telepon" name="telepon" required />
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="tanggalLahir">Tanggal Lahir</Label>
           <Input id="tanggalLahir" name="tanggalLahir" type="date" required />

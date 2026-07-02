@@ -3,10 +3,10 @@
 import { logout } from "@/actions/auth.actions";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, MenuIcon } from "lucide-react";
 import { ROLE_LABELS } from "@/components/layout/role-nav-items";
 
-export function DashboardTopbar({ nama, role }) {
+export function DashboardTopbar({ nama, role, onMenuClick }) {
   const initials = nama
     ?.split(" ")
     .slice(0, 2)
@@ -15,13 +15,24 @@ export function DashboardTopbar({ nama, role }) {
     .toUpperCase();
 
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b px-6">
-      <div className="font-semibold">Selaras</div>
+    <header className="flex h-14 shrink-0 items-center justify-between border-b px-4 sm:px-6">
+      <div className="flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={onMenuClick}
+          title="Menu"
+        >
+          <MenuIcon className="size-5" />
+        </Button>
+        <span className="font-semibold">Selaras</span>
+      </div>
       <div className="flex items-center gap-3">
         <Avatar className="size-8">
           <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
-        <div className="text-sm">
+        <div className="hidden text-sm sm:block">
           <p className="font-medium leading-none">{nama}</p>
           <p className="text-muted-foreground">{ROLE_LABELS[role]}</p>
         </div>
