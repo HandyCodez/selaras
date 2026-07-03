@@ -13,8 +13,19 @@ import {
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { PlusIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-export default async function RumahSakitPermintaanPage() {
+const STATUS_FILTERS = [
+  { value: "", label: "Semua" },
+  { value: "menunggu", label: "Menunggu" },
+  { value: "dikonfirmasi", label: "Dikonfirmasi" },
+  { value: "sebagian", label: "Sebagian" },
+  { value: "ditolak", label: "Ditolak" },
+  { value: "selesai", label: "Selesai" },
+];
+
+export default async function RumahSakitPermintaanPage({ searchParams }) {
+  const { status } = await searchParams;
   const user = await requireCurrentUser();
   if (!user.rumahSakit?.rumahSakitId) {
     // Cookies can't be cleared from a Server Component render — throw so
@@ -22,9 +33,10 @@ export default async function RumahSakitPermintaanPage() {
     throw new Error("Data akun rumah sakit tidak lengkap.");
   }
   await connectDB();
-  const permintaanList = await PermintaanDarah.find({
-    rumahSakitId: user.rumahSakit.rumahSakitId,
-  })
+  const filter = { rumahSakitId: user.rumahSakit.rumahSakitId };
+  if (status) filter.status = status;
+
+  const permintaanList = await PermintaanDarah.find(filter)
     .populate("cabangId", "nama kota")
     .sort({ createdAt: -1 })
     .lean();
@@ -37,6 +49,26 @@ export default async function RumahSakitPermintaanPage() {
           <PlusIcon className="size-4" />
           Ajukan Permintaan
         </Button>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {STATUS_FILTERS.map((f) => (
+          <Link
+            key={f.value}
+            href={
+              f.value
+                ? `/dashboard/rumah-sakit/permintaan?status=${f.value}`
+                : "/dashboard/rumah-sakit/permintaan"
+            }
+            className={cn(
+              "rounded-md border px-3 py-1.5 text-sm",
+              (status || "") === f.value
+                ? "border-primary bg-primary text-primary-foreground"
+                : "text-muted-foreground",
+            )}
+          >
+            {f.label}
+          </Link>
+        ))}
       </div>
       <Table>
         <TableHeader>

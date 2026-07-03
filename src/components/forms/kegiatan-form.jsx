@@ -72,20 +72,38 @@ export function KegiatanForm({ action, kegiatan }) {
           />
         </div>
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="status">Status</Label>
-        <Select name="status" defaultValue={kegiatan?.status || "draft"} required>
-          <SelectTrigger id="status" className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="aktif">Aktif</SelectItem>
-            <SelectItem value="selesai">Selesai</SelectItem>
-            <SelectItem value="dibatalkan">Dibatalkan</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="status">Status</Label>
+          <Select name="status" defaultValue={kegiatan?.status || "draft"} required>
+            <SelectTrigger id="status" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="aktif">Aktif</SelectItem>
+              <SelectItem value="selesai">Selesai</SelectItem>
+              <SelectItem value="dibatalkan">Dibatalkan</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="tipe">Untuk</Label>
+          <Select name="tipe" defaultValue={kegiatan?.tipe || "umum"} required>
+            <SelectTrigger id="tipe" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="umum">Umum</SelectItem>
+              <SelectItem value="internal">Internal</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
+      <p className="text-xs text-muted-foreground">
+        Kegiatan &quot;Internal&quot; tidak akan muncul di daftar yang dilihat
+        pendonor, tapi tetap bisa diakses lewat tautan langsung.
+      </p>
       {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
       <SubmitButton>{kegiatan ? "Simpan Perubahan" : "Buat Kegiatan"}</SubmitButton>
     </form>

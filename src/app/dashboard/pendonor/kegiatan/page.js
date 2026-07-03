@@ -12,17 +12,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { tanggalBolehDonorLagi } from "@/lib/pendonor";
 
 export default async function PendonorKegiatanPage() {
   const session = await requireRole("pendonor");
   await connectDB();
 
-  const kegiatanList = await Kegiatan.find({ status: "aktif" })
+  const kegiatanList = await Kegiatan.find({ status: "aktif", tipe: "umum" })
     .populate("cabangId", "nama kota")
     .sort({ tanggalMulai: 1 })
     .lean();
 
-  const [partisipasiList, terisiAgg] = await Promise.all([
+  const [partisipasiList, terisiAgg, lastDonasi] = await Promise.all([
     Partisipasi.find({
       donorId: session.userId,
       kegiatanId: { $in: kegiatanList.map((k) => k._id) },
@@ -31,6 +32,9 @@ export default async function PendonorKegiatanPage() {
       { $match: { kegiatanId: { $in: kegiatanList.map((k) => k._id) } } },
       { $group: { _id: "$kegiatanId", count: { $sum: 1 } } },
     ]),
+    Partisipasi.findOne({ donorId: session.userId, status: "selesai" })
+      .sort({ selesaiAt: -1 })
+      .lean(),
   ]);
   const statusByKegiatan = Object.fromEntries(
     partisipasiList.map((p) => [p.kegiatanId.toString(), p.status]),
@@ -38,6 +42,8 @@ export default async function PendonorKegiatanPage() {
   const terisiMap = Object.fromEntries(
     terisiAgg.map((t) => [t._id.toString(), t.count]),
   );
+  const eligibleDate = tanggalBolehDonorLagi(lastDonasi?.selesaiAt);
+  const belumBolehDonor = eligibleDate && new Date() < eligibleDate;
 
   return (
     <div className="space-y-6">
@@ -66,6 +72,10 @@ export default async function PendonorKegiatanPage() {
                   <StatusBadge status={status} />
                 ) : penuh ? (
                   <Badge variant="destructive">Kuota Penuh</Badge>
+                ) : belumBolehDonor ? (
+                  <Badge variant="outline">
+                    Boleh donor mulai {eligibleDate.toLocaleDateString("id-ID")}
+                  </Badge>
                 ) : (
                   <Button
                     render={<Link href={`/dashboard/pendonor/kegiatan/${k._id}`} />}

@@ -20,7 +20,7 @@ const CABANG_DATA = [
   { nama: "PMI Cabang Bontang", kota: "Bontang" },
 ];
 
-async function upsertPetugas({ nama, email, cabangId, jabatan }) {
+async function upsertPetugas({ nama, email, telepon, cabangId, jabatan }) {
   const passwordHash = await hashPassword("password123");
   return User.findOneAndUpdate(
     { email },
@@ -29,7 +29,7 @@ async function upsertPetugas({ nama, email, cabangId, jabatan }) {
       nama,
       email,
       passwordHash,
-      telepon: "080000000000",
+      telepon,
       petugas: { cabangId, jabatan },
     },
     { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
@@ -45,7 +45,7 @@ async function upsertAdmin() {
       nama: "Admin Selaras",
       email: "admin@selaras.test",
       passwordHash,
-      telepon: "080000000000",
+      telepon: "080000000001",
     },
     { upsert: true, returnDocument: "after", setDefaultsOnInsert: true },
   );
@@ -69,17 +69,20 @@ async function main() {
     console.log(`Cabang ready: ${doc.nama}`);
   }
 
+  let teleponCounter = 100;
   for (const cabang of cabangDocs) {
     const slug = cabang.kota.toLowerCase().replace(/\s+/g, "-");
     const staff = await upsertPetugas({
       nama: `Staff PMI ${cabang.kota}`,
       email: `staff.${slug}@pmi.test`,
+      telepon: `0800000${teleponCounter++}`,
       cabangId: cabang._id,
       jabatan: "staff",
     });
     const dokter = await upsertPetugas({
       nama: `Dokter PMI ${cabang.kota}`,
       email: `dokter.${slug}@pmi.test`,
+      telepon: `0800000${teleponCounter++}`,
       cabangId: cabang._id,
       jabatan: "dokter",
     });

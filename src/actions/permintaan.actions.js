@@ -67,14 +67,42 @@ export async function tolakPermintaan(permintaanId, prevState, formData) {
   }
 
   permintaan.status = "ditolak";
-  permintaan.catatan = formData.get("catatan") || permintaan.catatan;
+  permintaan.catatanPetugas = formData.get("catatan") || "";
   permintaan.handledBy = session.userId;
   permintaan.handledAt = new Date();
   await permintaan.save();
 
   revalidatePath(`/dashboard/petugas/permintaan/${permintaanId}`);
   revalidatePath("/dashboard/petugas/permintaan");
+  revalidatePath(`/dashboard/rumah-sakit/permintaan/${permintaanId}`);
   return { success: true, message: "Permintaan ditolak." };
+}
+
+// Only allowed while still "menunggu" — nothing has touched stock yet at
+// that point, so a hard delete is safe (matches batalkanPendaftaran's
+// pattern for pre-commitment cancellations).
+export async function batalkanPermintaan(permintaanId, prevState, formData) {
+  const session = await requireRole("rumah_sakit");
+  await connectDB();
+
+  const user = await User.findById(session.userId).lean();
+  if (!user?.rumahSakit?.rumahSakitId) {
+    await logout();
+  }
+
+  const permintaan = await PermintaanDarah.findOne({
+    _id: permintaanId,
+    rumahSakitId: user.rumahSakit.rumahSakitId,
+    status: "menunggu",
+  });
+  if (!permintaan) {
+    return { error: "Permintaan tidak ditemukan atau sudah diproses." };
+  }
+
+  await permintaan.deleteOne();
+
+  revalidatePath("/dashboard/rumah-sakit/permintaan");
+  return { success: true, message: "Permintaan dibatalkan." };
 }
 
 export async function konfirmasiPermintaan(permintaanId, prevState, formData) {
@@ -133,6 +161,7 @@ export async function konfirmasiPermintaan(permintaanId, prevState, formData) {
           ? "dikonfirmasi"
           : "sebagian"
         : "ditolak";
+      permintaan.catatanPetugas = formData.get("catatan") || "";
       permintaan.handledBy = session.userId;
       permintaan.handledAt = new Date();
       await permintaan.save({ session: mongoSession });
@@ -144,6 +173,7 @@ export async function konfirmasiPermintaan(permintaanId, prevState, formData) {
   revalidatePath(`/dashboard/petugas/permintaan/${permintaanId}`);
   revalidatePath("/dashboard/petugas/permintaan");
   revalidatePath("/dashboard/petugas/stok");
+  revalidatePath(`/dashboard/rumah-sakit/permintaan/${permintaanId}`);
 
   if (!anyFulfilled) {
     return { error: "Stok tidak mencukupi untuk memenuhi permintaan ini." };

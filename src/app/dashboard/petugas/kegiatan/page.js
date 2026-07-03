@@ -15,11 +15,24 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { PlusIcon } from "lucide-react";
 import { KegiatanStatusActions } from "@/components/petugas/kegiatan-status-actions";
 import { DeleteKegiatanButton } from "@/components/petugas/delete-kegiatan-button";
+import { cn } from "@/lib/utils";
 
-export default async function PetugasKegiatanPage() {
+const STATUS_FILTERS = [
+  { value: "", label: "Semua" },
+  { value: "draft", label: "Draft" },
+  { value: "aktif", label: "Aktif" },
+  { value: "selesai", label: "Selesai" },
+  { value: "dibatalkan", label: "Dibatalkan" },
+];
+
+export default async function PetugasKegiatanPage({ searchParams }) {
+  const { status } = await searchParams;
   const session = await requireRole("petugas");
   await connectDB();
-  const kegiatanList = await Kegiatan.find({ cabangId: session.cabangId })
+  const filter = { cabangId: session.cabangId };
+  if (status) filter.status = status;
+
+  const kegiatanList = await Kegiatan.find(filter)
     .sort({ tanggalMulai: -1 })
     .lean();
 
@@ -40,6 +53,26 @@ export default async function PetugasKegiatanPage() {
           Buat Kegiatan
         </Button>
       </div>
+      <div className="flex flex-wrap gap-2">
+        {STATUS_FILTERS.map((f) => (
+          <Link
+            key={f.value}
+            href={
+              f.value
+                ? `/dashboard/petugas/kegiatan?status=${f.value}`
+                : "/dashboard/petugas/kegiatan"
+            }
+            className={cn(
+              "rounded-md border px-3 py-1.5 text-sm",
+              (status || "") === f.value
+                ? "border-primary bg-primary text-primary-foreground"
+                : "text-muted-foreground",
+            )}
+          >
+            {f.label}
+          </Link>
+        ))}
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
@@ -48,6 +81,7 @@ export default async function PetugasKegiatanPage() {
             <TableHead>Tanggal Mulai</TableHead>
             <TableHead>Terisi</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Untuk</TableHead>
             <TableHead />
           </TableRow>
         </TableHeader>
@@ -62,6 +96,9 @@ export default async function PetugasKegiatanPage() {
               </TableCell>
               <TableCell>
                 <StatusBadge status={k.status} />
+              </TableCell>
+              <TableCell>
+                <StatusBadge status={k.tipe} />
               </TableCell>
               <TableCell className="flex justify-end gap-2">
                 <Button
@@ -81,7 +118,7 @@ export default async function PetugasKegiatanPage() {
           ))}
           {kegiatanList.length === 0 && (
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground">
+              <TableCell colSpan={7} className="text-center text-muted-foreground">
                 Belum ada kegiatan.
               </TableCell>
             </TableRow>

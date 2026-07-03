@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { connectDB } from "@/lib/db";
 import { Berita } from "@/lib/models";
+import { getSession } from "@/lib/auth";
+import { roleHome } from "@/lib/roles";
 import {
   Card,
   CardContent,
@@ -14,13 +16,17 @@ export default async function BeritaListPage() {
   const beritaList = await Berita.find({ status: "published" })
     .sort({ publishedAt: -1 })
     .lean();
+  const session = await getSession();
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-4 py-10">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Berita Donor Darah</h1>
-        <Link href="/" className="text-sm underline text-muted-foreground">
-          Kembali
+        <Link
+          href={session ? roleHome(session.role) : "/"}
+          className="text-sm underline text-muted-foreground"
+        >
+          {session ? "Kembali ke Dashboard" : "Kembali"}
         </Link>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">

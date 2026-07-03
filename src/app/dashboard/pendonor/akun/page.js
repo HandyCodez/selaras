@@ -1,6 +1,9 @@
+import Link from "next/link";
 import { requireCurrentUser } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DonorQrDisplay } from "@/components/qr/donor-qr-display";
+import { Button } from "@/components/ui/button";
+import { isPendonorProfileComplete } from "@/lib/pendonor";
 
 function Field({ label, value }) {
   return (
@@ -11,8 +14,15 @@ function Field({ label, value }) {
   );
 }
 
+function jenisKelaminLabel(jk) {
+  if (jk === "L") return "Laki-laki";
+  if (jk === "P") return "Perempuan";
+  return "-";
+}
+
 export default async function PendonorAkunPage() {
   const user = await requireCurrentUser();
+  const profileComplete = isPendonorProfileComplete(user);
 
   return (
     <div className="grid max-w-3xl gap-6 sm:grid-cols-2">
@@ -28,12 +38,20 @@ export default async function PendonorAkunPage() {
         </CardContent>
       </Card>
       <Card>
-        <CardHeader>
+        <CardHeader className="flex-row items-center justify-between space-y-0">
           <CardTitle>Data Diri</CardTitle>
+          <Button
+            render={<Link href="/dashboard/pendonor/lengkapi-profil" />}
+            variant="outline"
+            size="sm"
+          >
+            {profileComplete ? "Edit" : "Lengkapi"}
+          </Button>
         </CardHeader>
         <CardContent>
-          <Field label="Nama" value={user.nama} />
-          <Field label="Email" value={user.email} />
+          <Field label="Nama" value={user.nama || "-"} />
+          <Field label="NIK" value={user.pendonor?.nik || "-"} />
+          <Field label="Email" value={user.email || "-"} />
           <Field label="Telepon" value={user.telepon} />
           <Field
             label="Tanggal Lahir"
@@ -45,7 +63,7 @@ export default async function PendonorAkunPage() {
           />
           <Field
             label="Jenis Kelamin"
-            value={user.pendonor?.jenisKelamin === "L" ? "Laki-laki" : "Perempuan"}
+            value={jenisKelaminLabel(user.pendonor?.jenisKelamin)}
           />
           <Field label="Golongan Darah" value={user.pendonor?.golonganDarah || "-"} />
           <Field label="Alamat" value={user.pendonor?.alamat || "-"} />

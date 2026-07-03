@@ -15,6 +15,8 @@ const VARIANTS = {
   ditolak: "destructive",
   draft_berita: "secondary",
   published: "default",
+  umum: "secondary",
+  internal: "outline",
 };
 
 const LABELS = {
@@ -31,6 +33,8 @@ const LABELS = {
   sebagian: "Dipenuhi Sebagian",
   ditolak: "Ditolak",
   published: "Diterbitkan",
+  umum: "Umum",
+  internal: "Internal",
 };
 
 export function StatusBadge({ status }) {

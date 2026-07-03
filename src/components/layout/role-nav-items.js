@@ -18,6 +18,7 @@ export const NAV_ITEMS = {
     { href: "/dashboard/pendonor", label: "Beranda", icon: LayoutDashboardIcon },
     { href: "/berita", label: "Berita", icon: NewspaperIcon },
     { href: "/dashboard/pendonor/kegiatan", label: "Kegiatan Donor", icon: CalendarHeartIcon },
+    { href: "/dashboard/pendonor/stok", label: "Stok Darah", icon: DropletIcon },
     { href: "/dashboard/pendonor/riwayat", label: "Riwayat Donor", icon: HistoryIcon },
     { href: "/dashboard/pendonor/akun", label: "Akun Saya", icon: UserRoundIcon },
   ],
@@ -29,6 +30,7 @@ export const NAV_ITEMS = {
     { href: "/dashboard/petugas/permintaan", label: "Permintaan Darah", icon: ClipboardListIcon },
     { href: "/dashboard/petugas/stok", label: "Stok Darah", icon: DropletIcon },
     { href: "/dashboard/petugas/berita", label: "Kelola Berita", icon: NewspaperIcon },
+    { href: "/dashboard/petugas/akun", label: "Akun Saya", icon: UserRoundIcon },
   ],
   rumah_sakit: [
     { href: "/dashboard/rumah-sakit", label: "Beranda", icon: LayoutDashboardIcon },

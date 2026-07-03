@@ -60,6 +60,10 @@ export function PermintaanConfirmPanel({ permintaan, stokMap }) {
             ))}
           </TableBody>
         </Table>
+        <div className="space-y-2">
+          <Label htmlFor="confirmCatatan">Catatan (opsional)</Label>
+          <Textarea id="confirmCatatan" name="catatan" />
+        </div>
         {confirmState?.error && (
           <p className="text-sm text-destructive">{confirmState.error}</p>
         )}

@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { requireCurrentUser } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { RumahSakit } from "@/lib/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 function Field({ label, value }) {
   return (
@@ -20,27 +22,36 @@ export default async function RumahSakitAkunPage() {
   ).lean();
 
   return (
-    <div className="grid max-w-3xl gap-6 sm:grid-cols-2">
-      <Card>
-        <CardHeader>
-          <CardTitle>Data PIC</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Field label="Nama" value={user.nama} />
-          <Field label="Email" value={user.email} />
-          <Field label="Telepon" value={user.telepon} />
-        </CardContent>
-      </Card>
-      <Card>
-        <CardHeader>
-          <CardTitle>Data Rumah Sakit</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Field label="Nama Rumah Sakit" value={rumahSakit?.nama} />
-          <Field label="Kota" value={rumahSakit?.kota} />
-          <Field label="Alamat" value={rumahSakit?.alamat || "-"} />
-        </CardContent>
-      </Card>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Akun Saya</h1>
+        <Button render={<Link href="/dashboard/rumah-sakit/akun/edit" />} variant="outline">
+          Edit
+        </Button>
+      </div>
+      <div className="grid max-w-3xl gap-6 sm:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Data PIC</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Field label="Nama" value={user.nama} />
+            <Field label="Email" value={user.email || "-"} />
+            <Field label="Telepon" value={user.telepon} />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Data Rumah Sakit</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Field label="Nama Rumah Sakit" value={rumahSakit?.nama} />
+            <Field label="Kota" value={rumahSakit?.kota} />
+            <Field label="Alamat" value={rumahSakit?.alamat || "-"} />
+            <Field label="Telepon RS" value={rumahSakit?.telepon || "-"} />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

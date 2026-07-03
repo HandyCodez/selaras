@@ -12,8 +12,14 @@ export function LoginForm() {
   return (
     <form action={formAction} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input id="email" name="email" type="email" required autoComplete="email" />
+        <Label htmlFor="identifier">Email atau No. Telepon</Label>
+        <Input
+          id="identifier"
+          name="identifier"
+          type="text"
+          required
+          autoComplete="username"
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Kata Sandi</Label>

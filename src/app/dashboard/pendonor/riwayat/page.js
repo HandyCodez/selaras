@@ -13,12 +13,25 @@ import {
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { CancelPartisipasiButton } from "@/components/pendonor/cancel-partisipasi-button";
+import { cn } from "@/lib/utils";
 
-export default async function RiwayatDonorPage() {
+const STATUS_FILTERS = [
+  { value: "", label: "Semua" },
+  { value: "menunggu_checkin", label: "Menunggu Check-in" },
+  { value: "checked_in", label: "Sudah Check-in" },
+  { value: "lolos_donor", label: "Lolos" },
+  { value: "tidak_lolos", label: "Tidak Lolos" },
+  { value: "selesai", label: "Selesai" },
+];
+
+export default async function RiwayatDonorPage({ searchParams }) {
+  const { status } = await searchParams;
   const session = await requireRole("pendonor");
   await connectDB();
+  const filter = { donorId: session.userId };
+  if (status) filter.status = status;
 
-  const partisipasiList = await Partisipasi.find({ donorId: session.userId })
+  const partisipasiList = await Partisipasi.find(filter)
     .populate("kegiatanId", "judul lokasi tanggalMulai")
     .sort({ createdAt: -1 })
     .lean();
@@ -26,6 +39,26 @@ export default async function RiwayatDonorPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Riwayat Donor</h1>
+      <div className="flex flex-wrap gap-2">
+        {STATUS_FILTERS.map((f) => (
+          <Link
+            key={f.value}
+            href={
+              f.value
+                ? `/dashboard/pendonor/riwayat?status=${f.value}`
+                : "/dashboard/pendonor/riwayat"
+            }
+            className={cn(
+              "rounded-md border px-3 py-1.5 text-sm",
+              (status || "") === f.value
+                ? "border-primary bg-primary text-primary-foreground"
+                : "text-muted-foreground",
+            )}
+          >
+            {f.label}
+          </Link>
+        ))}
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
@@ -71,7 +104,7 @@ export default async function RiwayatDonorPage() {
           {partisipasiList.length === 0 && (
             <TableRow>
               <TableCell colSpan={4} className="text-center text-muted-foreground">
-                Anda belum pernah mendaftar donor darah.
+                Belum ada riwayat donor.
               </TableCell>
             </TableRow>
           )}

@@ -12,7 +12,7 @@ const createSchema = z.object({
   nama: z.string().min(1),
   email: z.string().email(),
   password: z.string().min(6),
-  telepon: z.string().optional(),
+  telepon: z.string().min(1),
   cabangId: z.string().min(1),
   jabatan: z.enum(["staff", "dokter"]),
 });
@@ -26,9 +26,16 @@ export async function createPetugasAccount(prevState, formData) {
   const data = parsed.data;
 
   await connectDB();
-  const existing = await User.findOne({ email: data.email });
+  const existing = await User.findOne({
+    $or: [{ email: data.email }, { telepon: data.telepon }],
+  });
   if (existing) {
-    return { error: "Email sudah terdaftar." };
+    return {
+      error:
+        existing.email === data.email
+          ? "Email sudah terdaftar."
+          : "Nomor HP sudah terdaftar.",
+    };
   }
 
   const passwordHash = await hashPassword(data.password);
@@ -37,7 +44,7 @@ export async function createPetugasAccount(prevState, formData) {
     nama: data.nama,
     email: data.email,
     passwordHash,
-    telepon: data.telepon || "",
+    telepon: data.telepon,
     petugas: { cabangId: data.cabangId, jabatan: data.jabatan },
   });
 
@@ -47,7 +54,7 @@ export async function createPetugasAccount(prevState, formData) {
 
 const updateSchema = z.object({
   nama: z.string().min(1),
-  telepon: z.string().optional(),
+  telepon: z.string().min(1),
   cabangId: z.string().min(1),
   jabatan: z.enum(["staff", "dokter"]),
   password: z.string().optional(),
@@ -68,8 +75,16 @@ export async function updatePetugasAccount(userId, prevState, formData) {
     return { error: "Akun petugas tidak ditemukan." };
   }
 
+  const telpConflict = await User.findOne({
+    telepon: data.telepon,
+    _id: { $ne: userId },
+  });
+  if (telpConflict) {
+    return { error: "Nomor HP sudah dipakai akun lain." };
+  }
+
   petugas.nama = data.nama;
-  petugas.telepon = data.telepon || "";
+  petugas.telepon = data.telepon;
   petugas.petugas = { cabangId: data.cabangId, jabatan: data.jabatan };
   if (data.password) {
     if (data.password.length < 6) {

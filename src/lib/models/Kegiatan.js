@@ -20,6 +20,14 @@ const KegiatanSchema = new mongoose.Schema(
       default: "draft",
       index: true,
     },
+    // Audience, not lifecycle: "umum" is browsable by any pendonor, while
+    // "internal" is hidden from the browse list (still reachable via a
+    // direct link, e.g. shared with a specific group).
+    tipe: {
+      type: String,
+      enum: ["umum", "internal"],
+      default: "umum",
+    },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true },

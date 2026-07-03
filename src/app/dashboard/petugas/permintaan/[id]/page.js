@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import { PermintaanDarah } from "@/lib/models";
 import { getStokByCabang } from "@/actions/stok.actions";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { Badge } from "@/components/ui/badge";
 import { PermintaanConfirmPanel } from "@/components/petugas/permintaan-confirm-panel";
 
 export default async function PetugasPermintaanDetailPage({ params }) {
@@ -29,11 +30,16 @@ export default async function PetugasPermintaanDetailPage({ params }) {
           <h1 className="text-2xl font-semibold">{permintaan.rumahSakitId?.nama}</h1>
           <p className="text-muted-foreground">{permintaan.rumahSakitId?.alamat}</p>
         </div>
-        <StatusBadge status={permintaan.status} />
+        <div className="flex items-center gap-2">
+          {permintaan.urgensi === "mendesak" && (
+            <Badge variant="destructive">Mendesak</Badge>
+          )}
+          <StatusBadge status={permintaan.status} />
+        </div>
       </div>
 
       {permintaan.catatan && (
-        <p className="text-sm text-muted-foreground">Catatan: {permintaan.catatan}</p>
+        <p className="text-sm text-muted-foreground">Catatan RS: {permintaan.catatan}</p>
       )}
 
       {permintaan.status === "menunggu" ? (
@@ -42,9 +48,14 @@ export default async function PetugasPermintaanDetailPage({ params }) {
           stokMap={stokMap}
         />
       ) : (
-        <p className="text-sm text-muted-foreground">
-          Permintaan ini sudah diproses.
-        </p>
+        <div className="space-y-2">
+          <p className="text-sm text-muted-foreground">Permintaan ini sudah diproses.</p>
+          {permintaan.catatanPetugas && (
+            <p className="text-sm text-muted-foreground">
+              Catatan Anda: {permintaan.catatanPetugas}
+            </p>
+          )}
+        </div>
       )}
     </div>
   );

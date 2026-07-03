@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { getStokByCabang } from "@/actions/stok.actions";
 import {
@@ -10,6 +11,8 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StokKoreksiForm } from "@/components/petugas/stok-koreksi-form";
+import { Button } from "@/components/ui/button";
+import { HistoryIcon } from "lucide-react";
 
 export default async function PetugasStokPage() {
   const session = await requireRole("petugas");
@@ -17,7 +20,13 @@ export default async function PetugasStokPage() {
 
   return (
     <div className="max-w-xl space-y-6">
-      <h1 className="text-2xl font-semibold">Stok Darah</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold">Stok Darah</h1>
+        <Button render={<Link href="/dashboard/petugas/stok/riwayat" />} variant="outline">
+          <HistoryIcon className="size-4" />
+          Riwayat
+        </Button>
+      </div>
       <Table>
         <TableHeader>
           <TableRow>

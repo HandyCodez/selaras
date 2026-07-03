@@ -38,6 +38,7 @@ const PermintaanDarahSchema = new mongoose.Schema(
       index: true,
     },
     catatan: { type: String, default: "" },
+    catatanPetugas: { type: String, default: "" },
     handledBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
     handledAt: { type: Date },
   },

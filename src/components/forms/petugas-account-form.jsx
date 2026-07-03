@@ -30,7 +30,7 @@ export function PetugasAccountForm({ action, cabangList, petugas }) {
       )}
       <div className="space-y-2">
         <Label htmlFor="telepon">Telepon</Label>
-        <Input id="telepon" name="telepon" defaultValue={petugas?.telepon} />
+        <Input id="telepon" name="telepon" defaultValue={petugas?.telepon} required />
       </div>
       <div className="space-y-2">
         <Label htmlFor="cabangId">Cabang PMI</Label>

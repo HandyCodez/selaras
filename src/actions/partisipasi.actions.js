@@ -10,6 +10,7 @@ import { requireRole } from "@/lib/auth";
 import { verifyDonorQrPayload } from "@/lib/qr";
 import { adjustStokDarah } from "@/actions/stok.actions";
 import { GOLONGAN_DARAH } from "@/lib/blood-types";
+import { isPendonorProfileComplete, tanggalBolehDonorLagi } from "@/lib/pendonor";
 
 const kuesionerSchema = z.object({
   kegiatanId: z.string().min(1),
@@ -31,6 +32,26 @@ export async function daftarKegiatan(prevState, formData) {
   const data = parsed.data;
 
   await connectDB();
+  const donor = await User.findById(session.userId).lean();
+  if (!isPendonorProfileComplete(donor)) {
+    return {
+      error: "Lengkapi data diri Anda terlebih dahulu sebelum mendonorkan darah.",
+    };
+  }
+
+  const lastDonasi = await Partisipasi.findOne({
+    donorId: session.userId,
+    status: "selesai",
+  })
+    .sort({ selesaiAt: -1 })
+    .lean();
+  const eligibleDate = tanggalBolehDonorLagi(lastDonasi?.selesaiAt);
+  if (eligibleDate && new Date() < eligibleDate) {
+    return {
+      error: `Anda baru bisa donor lagi mulai ${eligibleDate.toLocaleDateString("id-ID")} (jarak minimal antar donor).`,
+    };
+  }
+
   const kegiatan = await Kegiatan.findOne({
     _id: data.kegiatanId,
     status: "aktif",

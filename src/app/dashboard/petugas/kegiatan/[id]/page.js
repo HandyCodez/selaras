@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { KegiatanStatusActions } from "@/components/petugas/kegiatan-status-actions";
+import { CopyKegiatanLink } from "@/components/petugas/copy-kegiatan-link";
 
 export default async function KegiatanDetailPage({ params }) {
   const { id } = await params;
@@ -45,6 +46,7 @@ export default async function KegiatanDetailPage({ params }) {
         </div>
         <div className="flex items-center gap-2">
           <StatusBadge status={kegiatan.status} />
+          <StatusBadge status={kegiatan.tipe} />
           <KegiatanStatusActions kegiatanId={id} status={kegiatan.status} />
           <Button
             render={<Link href={`/dashboard/petugas/kegiatan/${id}/edit`} />}
@@ -62,6 +64,22 @@ export default async function KegiatanDetailPage({ params }) {
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Link Kegiatan untuk Pendonor</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <CopyKegiatanLink kegiatanId={id} />
+          {kegiatan.tipe === "internal" && (
+            <p className="text-xs text-muted-foreground">
+              Kegiatan ini bertipe Internal — tidak muncul di daftar kegiatan
+              yang dilihat pendonor. Bagikan link ini secara langsung ke
+              pendonor yang dituju.
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

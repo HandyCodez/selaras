@@ -6,40 +6,34 @@ import { connectDB } from "@/lib/db";
 import { User, RumahSakit, PmiCabang } from "@/lib/models";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import { createSessionCookie, destroySessionCookie } from "@/lib/session";
-import { GOLONGAN_DARAH } from "@/lib/blood-types";
-
-function roleHome(role) {
-  if (role === "petugas") return "/dashboard/petugas";
-  if (role === "rumah_sakit") return "/dashboard/rumah-sakit";
-  if (role === "admin") return "/dashboard/admin";
-  return "/dashboard/pendonor";
-}
+import { roleHome } from "@/lib/roles";
 
 const loginSchema = z.object({
-  email: z.string().email(),
+  identifier: z.string().min(1),
   password: z.string().min(1),
 });
 
 export async function login(prevState, formData) {
   const parsed = loginSchema.safeParse({
-    email: formData.get("email"),
+    identifier: formData.get("identifier"),
     password: formData.get("password"),
   });
   if (!parsed.success) {
-    return { error: "Email atau kata sandi tidak valid." };
+    return { error: "Email/No. HP atau kata sandi tidak valid." };
   }
 
   await connectDB();
-  const user = await User.findOne({ email: parsed.data.email }).select(
-    "+passwordHash",
-  );
+  const identifier = parsed.data.identifier.trim().toLowerCase();
+  const user = await User.findOne({
+    $or: [{ email: identifier }, { telepon: parsed.data.identifier.trim() }],
+  }).select("+passwordHash");
   if (!user || !user.isActive) {
-    return { error: "Email atau kata sandi salah." };
+    return { error: "Email/No. HP atau kata sandi salah." };
   }
 
   const valid = await verifyPassword(parsed.data.password, user.passwordHash);
   if (!valid) {
-    return { error: "Email atau kata sandi salah." };
+    return { error: "Email/No. HP atau kata sandi salah." };
   }
 
   await createSessionCookie(user);
@@ -52,43 +46,37 @@ export async function logout() {
 }
 
 const registerPendonorSchema = z.object({
-  nama: z.string().min(1),
-  email: z.string().email(),
+  telepon: z.string().min(8, "Nomor HP tidak valid."),
   password: z.string().min(6),
-  telepon: z.string().min(1),
-  tanggalLahir: z.string().min(1),
-  jenisKelamin: z.enum(["L", "P"]),
-  golonganDarah: z.enum([...GOLONGAN_DARAH, ""]).optional(),
-  alamat: z.string().optional(),
 });
 
+// Registration is intentionally minimal — just telepon + password. Personal
+// data (nama, tanggal lahir, jenis kelamin, alamat) is filled in later via
+// the "lengkapi profil" flow, required before the donor can join a kegiatan.
+// Golongan darah is never self-reported — only petugas set it, during the
+// medical interview (see submitWawancara in partisipasi.actions.js).
 export async function registerPendonor(prevState, formData) {
-  const raw = Object.fromEntries(formData.entries());
-  const parsed = registerPendonorSchema.safeParse(raw);
+  const parsed = registerPendonorSchema.safeParse({
+    telepon: formData.get("telepon"),
+    password: formData.get("password"),
+  });
   if (!parsed.success) {
     return { error: "Data pendaftaran tidak lengkap atau tidak valid." };
   }
   const data = parsed.data;
 
   await connectDB();
-  const existing = await User.findOne({ email: data.email });
+  const existing = await User.findOne({ telepon: data.telepon });
   if (existing) {
-    return { error: "Email sudah terdaftar." };
+    return { error: "Nomor HP sudah terdaftar." };
   }
 
   const passwordHash = await hashPassword(data.password);
   const user = await User.create({
     role: "pendonor",
-    nama: data.nama,
-    email: data.email,
-    passwordHash,
     telepon: data.telepon,
-    pendonor: {
-      tanggalLahir: data.tanggalLahir,
-      jenisKelamin: data.jenisKelamin,
-      golonganDarah: data.golonganDarah || null,
-      alamat: data.alamat || "",
-    },
+    passwordHash,
+    pendonor: {},
   });
 
   await createSessionCookie(user);
@@ -115,9 +103,16 @@ export async function registerRumahSakit(prevState, formData) {
   const data = parsed.data;
 
   await connectDB();
-  const existingUser = await User.findOne({ email: data.email });
+  const existingUser = await User.findOne({
+    $or: [{ email: data.email }, { telepon: data.telepon }],
+  });
   if (existingUser) {
-    return { error: "Email sudah terdaftar." };
+    return {
+      error:
+        existingUser.email === data.email
+          ? "Email sudah terdaftar."
+          : "Nomor HP sudah terdaftar.",
+    };
   }
 
   const cabang = await PmiCabang.findById(data.defaultCabangId);

@@ -15,6 +15,7 @@ const kegiatanSchema = z.object({
   tanggalMulai: z.string().min(1),
   tanggalSelesai: z.string().min(1),
   status: z.enum(["draft", "aktif", "selesai", "dibatalkan"]),
+  tipe: z.enum(["umum", "internal"]),
 });
 
 export async function createKegiatan(prevState, formData) {
@@ -39,6 +40,7 @@ export async function createKegiatan(prevState, formData) {
     tanggalMulai: data.tanggalMulai,
     tanggalSelesai: data.tanggalSelesai,
     status: data.status,
+    tipe: data.tipe,
     createdBy: session.userId,
   });
 
@@ -82,6 +84,7 @@ export async function updateKegiatan(kegiatanId, prevState, formData) {
     tanggalMulai: data.tanggalMulai,
     tanggalSelesai: data.tanggalSelesai,
     status: data.status,
+    tipe: data.tipe,
   });
   await kegiatan.save();
 

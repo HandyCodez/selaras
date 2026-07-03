@@ -6,7 +6,7 @@ export default async function DashboardLayout({ children }) {
   const user = await requireCurrentUser();
 
   return (
-    <DashboardShell role={session.role} nama={user.nama}>
+    <DashboardShell role={session.role} nama={user.nama || user.telepon}>
       {children}
     </DashboardShell>
   );

@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { CancelPermintaanButton } from "@/components/rumah-sakit/cancel-permintaan-button";
 
 export default async function RumahSakitPermintaanDetailPage({ params }) {
   const { id } = await params;
@@ -72,12 +73,27 @@ export default async function RumahSakitPermintaanDetailPage({ params }) {
       {permintaan.catatan && (
         <Card>
           <CardHeader>
-            <CardTitle>Catatan</CardTitle>
+            <CardTitle>Catatan Anda</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
             {permintaan.catatan}
           </CardContent>
         </Card>
+      )}
+
+      {permintaan.catatanPetugas && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Catatan dari Petugas PMI</CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            {permintaan.catatanPetugas}
+          </CardContent>
+        </Card>
+      )}
+
+      {permintaan.status === "menunggu" && (
+        <CancelPermintaanButton permintaanId={permintaan._id.toString()} />
       )}
     </div>
   );
