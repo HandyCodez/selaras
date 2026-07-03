@@ -24,6 +24,7 @@ export function DashboardShell({ role, nama, children }) {
         )}
         <DashboardSidebar
           role={role}
+          nama={nama}
           open={sidebarOpen}
           onNavigate={() => setSidebarOpen(false)}
         />

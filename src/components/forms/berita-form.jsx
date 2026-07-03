@@ -13,6 +13,11 @@ import {
 } from "@/components/ui/select";
 import { SubmitButton } from "@/components/forms/submit-button";
 
+const STATUS_LABELS = {
+  draft: "Draft",
+  published: "Terbitkan",
+};
+
 export function BeritaForm({ action, berita }) {
   const [state, formAction] = useActionState(action, null);
 
@@ -45,7 +50,7 @@ export function BeritaForm({ action, berita }) {
         <Label htmlFor="status">Status</Label>
         <Select name="status" defaultValue={berita?.status || "draft"} required>
           <SelectTrigger id="status" className="w-full">
-            <SelectValue />
+            <SelectValue>{(value) => STATUS_LABELS[value] ?? value}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="draft">Draft</SelectItem>

@@ -13,7 +13,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { CancelPartisipasiButton } from "@/components/pendonor/cancel-partisipasi-button";
-import { cn } from "@/lib/utils";
+import { FilterTabs } from "@/components/shared/filter-tabs";
+import { EmptyState } from "@/components/shared/empty-state";
+import { HistoryIcon } from "lucide-react";
 
 const STATUS_FILTERS = [
   { value: "", label: "Semua" },
@@ -39,77 +41,68 @@ export default async function RiwayatDonorPage({ searchParams }) {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Riwayat Donor</h1>
-      <div className="flex flex-wrap gap-2">
-        {STATUS_FILTERS.map((f) => (
-          <Link
-            key={f.value}
-            href={
-              f.value
-                ? `/dashboard/pendonor/riwayat?status=${f.value}`
-                : "/dashboard/pendonor/riwayat"
-            }
-            className={cn(
-              "rounded-md border px-3 py-1.5 text-sm",
-              (status || "") === f.value
-                ? "border-primary bg-primary text-primary-foreground"
-                : "text-muted-foreground",
-            )}
-          >
-            {f.label}
-          </Link>
-        ))}
-      </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Kegiatan</TableHead>
-            <TableHead>Tanggal</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {partisipasiList.map((p) => (
-            <TableRow key={p._id}>
-              <TableCell className="font-medium">{p.kegiatanId?.judul}</TableCell>
-              <TableCell>
-                {new Date(p.kegiatanId?.tanggalMulai).toLocaleDateString("id-ID")}
-              </TableCell>
-              <TableCell>
-                <StatusBadge status={p.status} />
-              </TableCell>
-              <TableCell className="flex gap-2">
-                <Button
-                  render={<Link href={`/dashboard/pendonor/kuesioner/${p._id}`} />}
-                  variant="ghost"
-                  size="sm"
-                >
-                  Kuesioner
-                </Button>
-                {p.wawancara && (
+      <FilterTabs
+        options={STATUS_FILTERS}
+        activeValue={status}
+        baseHref="/dashboard/pendonor/riwayat"
+      />
+      {partisipasiList.length === 0 ? (
+        <EmptyState
+          icon={HistoryIcon}
+          title="Belum ada riwayat donor"
+          description="Riwayat pendaftaran dan donor darah Anda akan muncul di sini."
+          action={
+            <Button render={<Link href="/dashboard/pendonor/kegiatan" />} size="sm">
+              Lihat Kegiatan Donor
+            </Button>
+          }
+        />
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Kegiatan</TableHead>
+              <TableHead>Tanggal</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {partisipasiList.map((p) => (
+              <TableRow key={p._id}>
+                <TableCell className="font-medium">{p.kegiatanId?.judul}</TableCell>
+                <TableCell>
+                  {new Date(p.kegiatanId?.tanggalMulai).toLocaleDateString("id-ID")}
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={p.status} />
+                </TableCell>
+                <TableCell className="flex flex-wrap justify-end gap-2">
                   <Button
-                    render={<Link href={`/dashboard/pendonor/wawancara/${p._id}`} />}
+                    render={<Link href={`/dashboard/pendonor/kuesioner/${p._id}`} />}
                     variant="ghost"
                     size="sm"
                   >
-                    Wawancara
+                    Kuesioner
                   </Button>
-                )}
-                {p.status === "menunggu_checkin" && (
-                  <CancelPartisipasiButton partisipasiId={p._id.toString()} />
-                )}
-              </TableCell>
-            </TableRow>
-          ))}
-          {partisipasiList.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={4} className="text-center text-muted-foreground">
-                Belum ada riwayat donor.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+                  {p.wawancara && (
+                    <Button
+                      render={<Link href={`/dashboard/pendonor/wawancara/${p._id}`} />}
+                      variant="ghost"
+                      size="sm"
+                    >
+                      Wawancara
+                    </Button>
+                  )}
+                  {p.status === "menunggu_checkin" && (
+                    <CancelPartisipasiButton partisipasiId={p._id.toString()} />
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 }

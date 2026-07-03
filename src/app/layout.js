@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { AiChatWidget } from "@/components/shared/ai-chat-widget";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Selaras - Donor Darah",
   description: "Aplikasi donor darah PMI",
+  icons: {
+    icon: "/logo.jpeg",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -26,6 +30,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-full flex flex-col">
         {children}
         <Toaster position="top-center" />
+        <AiChatWidget />
       </body>
     </html>
   );

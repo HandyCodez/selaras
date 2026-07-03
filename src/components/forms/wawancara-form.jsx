@@ -15,6 +15,11 @@ import {
 import { SubmitButton } from "@/components/forms/submit-button";
 import { GOLONGAN_DARAH } from "@/lib/blood-types";
 
+const HASIL_LABELS = {
+  lolos: "Lolos",
+  tidak_lolos: "Tidak Lolos",
+};
+
 export function WawancaraForm({ partisipasi, onDone }) {
   const action = submitWawancara.bind(null, partisipasi._id);
   const [state, formAction] = useActionState(action, null);
@@ -72,7 +77,9 @@ export function WawancaraForm({ partisipasi, onDone }) {
         <Label htmlFor="hasil">Hasil</Label>
         <Select name="hasil" required>
           <SelectTrigger id="hasil" className="w-full">
-            <SelectValue placeholder="Pilih hasil" />
+            <SelectValue placeholder="Pilih hasil">
+              {(value) => HASIL_LABELS[value] ?? "Pilih hasil"}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="lolos">Lolos</SelectItem>

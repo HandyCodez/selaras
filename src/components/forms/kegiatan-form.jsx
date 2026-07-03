@@ -13,6 +13,18 @@ import {
 } from "@/components/ui/select";
 import { SubmitButton } from "@/components/forms/submit-button";
 
+const STATUS_LABELS = {
+  draft: "Draft",
+  aktif: "Aktif",
+  selesai: "Selesai",
+  dibatalkan: "Dibatalkan",
+};
+
+const TIPE_LABELS = {
+  umum: "Umum",
+  internal: "Internal",
+};
+
 function toLocalInputValue(date) {
   if (!date) return "";
   const d = new Date(date);
@@ -77,7 +89,7 @@ export function KegiatanForm({ action, kegiatan }) {
           <Label htmlFor="status">Status</Label>
           <Select name="status" defaultValue={kegiatan?.status || "draft"} required>
             <SelectTrigger id="status" className="w-full">
-              <SelectValue />
+              <SelectValue>{(value) => STATUS_LABELS[value] ?? value}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="draft">Draft</SelectItem>
@@ -91,7 +103,7 @@ export function KegiatanForm({ action, kegiatan }) {
           <Label htmlFor="tipe">Untuk</Label>
           <Select name="tipe" defaultValue={kegiatan?.tipe || "umum"} required>
             <SelectTrigger id="tipe" className="w-full">
-              <SelectValue />
+              <SelectValue>{(value) => TIPE_LABELS[value] ?? value}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="umum">Umum</SelectItem>

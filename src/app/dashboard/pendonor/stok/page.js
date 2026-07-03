@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { PmiCabang } from "@/lib/models";
@@ -11,7 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { FilterTabs } from "@/components/shared/filter-tabs";
+import { DropletIcon } from "lucide-react";
 
 export default async function PendonorStokPage({ searchParams }) {
   const { cabangId } = await searchParams;
@@ -25,23 +26,18 @@ export default async function PendonorStokPage({ searchParams }) {
 
   return (
     <div className="max-w-xl space-y-6">
-      <h1 className="text-2xl font-semibold">Stok Darah</h1>
-      <div className="flex flex-wrap gap-2">
-        {cabangList.map((c) => (
-          <Link
-            key={c._id}
-            href={`/dashboard/pendonor/stok?cabangId=${c._id}`}
-            className={cn(
-              "rounded-md border px-3 py-1.5 text-sm",
-              activeCabangId === c._id.toString()
-                ? "border-primary bg-primary text-primary-foreground"
-                : "text-muted-foreground",
-            )}
-          >
-            {c.nama}
-          </Link>
-        ))}
+      <div>
+        <h1 className="text-2xl font-semibold">Stok Darah</h1>
+        <p className="text-muted-foreground">
+          Cek ketersediaan stok darah di cabang PMI terdekat.
+        </p>
       </div>
+      <FilterTabs
+        options={cabangList.map((c) => ({ value: c._id.toString(), label: c.nama }))}
+        activeValue={activeCabangId}
+        baseHref="/dashboard/pendonor/stok"
+        paramName="cabangId"
+      />
       <Table>
         <TableHeader>
           <TableRow>
@@ -52,7 +48,12 @@ export default async function PendonorStokPage({ searchParams }) {
         <TableBody>
           {stok.map((s) => (
             <TableRow key={s.golonganDarah}>
-              <TableCell className="font-medium">{s.golonganDarah}</TableCell>
+              <TableCell className="font-medium">
+                <Badge variant="outline" className="gap-1">
+                  <DropletIcon className="size-3 text-rose-600" />
+                  {s.golonganDarah}
+                </Badge>
+              </TableCell>
               <TableCell>{s.jumlahKantong}</TableCell>
             </TableRow>
           ))}

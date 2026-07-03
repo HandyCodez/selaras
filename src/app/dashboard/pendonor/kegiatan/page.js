@@ -12,7 +12,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { CapacityBar } from "@/components/shared/capacity-bar";
+import { EmptyState } from "@/components/shared/empty-state";
 import { tanggalBolehDonorLagi } from "@/lib/pendonor";
+import { formatRentangWaktu } from "@/lib/format";
+import { CalendarHeartIcon, MapPinIcon, CalendarDaysIcon } from "lucide-react";
 
 export default async function PendonorKegiatanPage() {
   const session = await requireRole("pendonor");
@@ -47,53 +51,64 @@ export default async function PendonorKegiatanPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Kegiatan Donor Darah</h1>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {kegiatanList.map((k) => {
-          const status = statusByKegiatan[k._id.toString()];
-          const terisi = terisiMap[k._id.toString()] || 0;
-          const penuh = terisi >= k.kuota;
-          return (
-            <Card key={k._id}>
-              <CardHeader>
-                <CardTitle>{k.judul}</CardTitle>
-                <CardDescription>
-                  {k.cabangId?.nama} &middot; {k.lokasi}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-muted-foreground">
-                  {new Date(k.tanggalMulai).toLocaleString("id-ID")}
-                </p>
-                <Badge variant="secondary">
-                  {terisi}/{k.kuota} pendonor
-                </Badge>
-                {status ? (
-                  <StatusBadge status={status} />
-                ) : penuh ? (
-                  <Badge variant="destructive">Kuota Penuh</Badge>
-                ) : belumBolehDonor ? (
-                  <Badge variant="outline">
-                    Boleh donor mulai {eligibleDate.toLocaleDateString("id-ID")}
-                  </Badge>
-                ) : (
-                  <Button
-                    render={<Link href={`/dashboard/pendonor/kegiatan/${k._id}`} />}
-                    size="sm"
-                  >
-                    Ikut Donor
-                  </Button>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
-        {kegiatanList.length === 0 && (
-          <p className="text-muted-foreground">
-            Belum ada kegiatan donor darah aktif saat ini.
-          </p>
-        )}
+      <div>
+        <h1 className="text-2xl font-semibold">Kegiatan Donor Darah</h1>
+        <p className="text-muted-foreground">
+          Pilih kegiatan donor darah terdekat dan ikut berpartisipasi.
+        </p>
       </div>
+      {kegiatanList.length === 0 ? (
+        <EmptyState
+          icon={CalendarHeartIcon}
+          title="Belum ada kegiatan aktif"
+          description="Kegiatan donor darah aktif akan muncul di sini. Cek lagi nanti ya."
+        />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {kegiatanList.map((k) => {
+            const status = statusByKegiatan[k._id.toString()];
+            const terisi = terisiMap[k._id.toString()] || 0;
+            const penuh = terisi >= k.kuota;
+            return (
+              <Card key={k._id} className="flex flex-col">
+                <CardHeader>
+                  <CardTitle>{k.judul}</CardTitle>
+                  <CardDescription className="flex items-center gap-1.5">
+                    <MapPinIcon className="size-3.5 shrink-0" />
+                    {k.cabangId?.nama} &middot; {k.lokasi}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-1 flex-col justify-between gap-4">
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <CalendarDaysIcon className="size-4 shrink-0" />
+                    {formatRentangWaktu(k.tanggalMulai, k.tanggalSelesai)}
+                  </div>
+                  <CapacityBar terisi={terisi} kuota={k.kuota} />
+                  <div>
+                    {status ? (
+                      <StatusBadge status={status} />
+                    ) : penuh ? (
+                      <Badge variant="destructive">Kuota Penuh</Badge>
+                    ) : belumBolehDonor ? (
+                      <Badge variant="outline">
+                        Boleh donor mulai {eligibleDate.toLocaleDateString("id-ID")}
+                      </Badge>
+                    ) : (
+                      <Button
+                        render={<Link href={`/dashboard/pendonor/kegiatan/${k._id}`} />}
+                        size="sm"
+                        className="w-full"
+                      >
+                        Ikut Donor
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

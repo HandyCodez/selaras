@@ -34,7 +34,11 @@ export function CheckinPanel({ kegiatanList }) {
         <Label htmlFor="kegiatanId">Kegiatan</Label>
         <Select value={kegiatanId} onValueChange={setKegiatanId}>
           <SelectTrigger id="kegiatanId" className="w-full">
-            <SelectValue placeholder="Pilih kegiatan" />
+            <SelectValue placeholder="Pilih kegiatan">
+              {(value) =>
+                kegiatanList.find((k) => k._id === value)?.judul || "Pilih kegiatan"
+              }
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {kegiatanList.map((k) => (

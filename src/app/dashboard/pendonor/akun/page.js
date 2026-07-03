@@ -3,16 +3,18 @@ import { requireCurrentUser } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DonorQrDisplay } from "@/components/qr/donor-qr-display";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { DetailField } from "@/components/shared/detail-field";
 import { isPendonorProfileComplete } from "@/lib/pendonor";
-
-function Field({ label, value }) {
-  return (
-    <div className="flex justify-between border-b py-2 text-sm last:border-0">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium">{value}</span>
-    </div>
-  );
-}
+import {
+  IdCardIcon,
+  MailIcon,
+  PhoneIcon,
+  CakeIcon,
+  UsersIcon,
+  MapPinIcon,
+  DropletIcon,
+} from "lucide-react";
 
 function jenisKelaminLabel(jk) {
   if (jk === "L") return "Laki-laki";
@@ -26,13 +28,23 @@ export default async function PendonorAkunPage() {
 
   return (
     <div className="grid max-w-3xl gap-6 sm:grid-cols-2">
-      <Card>
-        <CardHeader>
-          <CardTitle>QR Code Pendonor</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="bg-rose-600 text-white">
+          <CardTitle className="flex items-center gap-2 text-white">
+            <IdCardIcon className="size-5" />
+            Kartu Donor Digital
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4 pt-6 text-center">
           <DonorQrDisplay userId={user._id.toString()} />
-          <p className="mt-3 text-center text-sm text-muted-foreground">
+          <div>
+            <p className="font-semibold">{user.nama || user.telepon}</p>
+            <Badge variant="secondary" className="mt-1 gap-1">
+              <DropletIcon className="size-3" />
+              {user.pendonor?.golonganDarah || "Golongan darah belum diketahui"}
+            </Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">
             Tunjukkan QR ini saat check-in di lokasi donor darah.
           </p>
         </CardContent>
@@ -49,11 +61,12 @@ export default async function PendonorAkunPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          <Field label="Nama" value={user.nama || "-"} />
-          <Field label="NIK" value={user.pendonor?.nik || "-"} />
-          <Field label="Email" value={user.email || "-"} />
-          <Field label="Telepon" value={user.telepon} />
-          <Field
+          <DetailField icon={IdCardIcon} label="Nama" value={user.nama || "-"} />
+          <DetailField icon={IdCardIcon} label="NIK" value={user.pendonor?.nik || "-"} />
+          <DetailField icon={MailIcon} label="Email" value={user.email || "-"} />
+          <DetailField icon={PhoneIcon} label="Telepon" value={user.telepon} />
+          <DetailField
+            icon={CakeIcon}
             label="Tanggal Lahir"
             value={
               user.pendonor?.tanggalLahir
@@ -61,12 +74,21 @@ export default async function PendonorAkunPage() {
                 : "-"
             }
           />
-          <Field
+          <DetailField
+            icon={UsersIcon}
             label="Jenis Kelamin"
             value={jenisKelaminLabel(user.pendonor?.jenisKelamin)}
           />
-          <Field label="Golongan Darah" value={user.pendonor?.golonganDarah || "-"} />
-          <Field label="Alamat" value={user.pendonor?.alamat || "-"} />
+          <DetailField
+            icon={DropletIcon}
+            label="Golongan Darah"
+            value={user.pendonor?.golonganDarah || "-"}
+          />
+          <DetailField
+            icon={MapPinIcon}
+            label="Alamat"
+            value={user.pendonor?.alamat || "-"}
+          />
         </CardContent>
       </Card>
     </div>

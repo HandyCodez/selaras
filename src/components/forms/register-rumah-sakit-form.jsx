@@ -50,7 +50,12 @@ export function RegisterRumahSakitForm({ cabangList }) {
         <Label htmlFor="defaultCabangId">Cabang PMI Terdekat</Label>
         <Select name="defaultCabangId" required>
           <SelectTrigger id="defaultCabangId" className="w-full">
-            <SelectValue placeholder="Pilih cabang PMI" />
+            <SelectValue placeholder="Pilih cabang PMI">
+              {(value) => {
+                const cabang = cabangList.find((c) => c._id === value);
+                return cabang ? `${cabang.nama} - ${cabang.kota}` : "Pilih cabang PMI";
+              }}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {cabangList.map((cabang) => (

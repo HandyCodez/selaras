@@ -8,6 +8,8 @@ import {
   StethoscopeIcon,
   DropletIcon,
   ClipboardListIcon,
+  ClipboardCheckIcon,
+  HeartHandshakeIcon,
   LayoutDashboardIcon,
   Building2Icon,
   UsersIcon,
@@ -16,7 +18,9 @@ import {
 export const NAV_ITEMS = {
   pendonor: [
     { href: "/dashboard/pendonor", label: "Beranda", icon: LayoutDashboardIcon },
+    { href: "/syarat-donor", label: "Syarat Donor", icon: ClipboardCheckIcon },
     { href: "/berita", label: "Berita", icon: NewspaperIcon },
+    { href: "/komunitas", label: "Komunitas", icon: HeartHandshakeIcon },
     { href: "/dashboard/pendonor/kegiatan", label: "Kegiatan Donor", icon: CalendarHeartIcon },
     { href: "/dashboard/pendonor/stok", label: "Stok Darah", icon: DropletIcon },
     { href: "/dashboard/pendonor/riwayat", label: "Riwayat Donor", icon: HistoryIcon },

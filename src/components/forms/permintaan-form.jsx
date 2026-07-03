@@ -15,6 +15,11 @@ import {
 import { SubmitButton } from "@/components/forms/submit-button";
 import { GOLONGAN_DARAH } from "@/lib/blood-types";
 
+const URGENSI_LABELS = {
+  biasa: "Biasa",
+  mendesak: "Mendesak",
+};
+
 export function PermintaanForm({ cabangList, defaultCabangId }) {
   const [state, formAction] = useActionState(createPermintaan, null);
 
@@ -24,7 +29,12 @@ export function PermintaanForm({ cabangList, defaultCabangId }) {
         <Label htmlFor="cabangId">Cabang PMI Tujuan</Label>
         <Select name="cabangId" defaultValue={defaultCabangId} required>
           <SelectTrigger id="cabangId" className="w-full">
-            <SelectValue placeholder="Pilih cabang PMI" />
+            <SelectValue placeholder="Pilih cabang PMI">
+              {(value) => {
+                const cabang = cabangList.find((c) => c._id === value);
+                return cabang ? `${cabang.nama} - ${cabang.kota}` : "Pilih cabang PMI";
+              }}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {cabangList.map((cabang) => (
@@ -60,7 +70,7 @@ export function PermintaanForm({ cabangList, defaultCabangId }) {
         <Label htmlFor="urgensi">Urgensi</Label>
         <Select name="urgensi" defaultValue="biasa" required>
           <SelectTrigger id="urgensi" className="w-full">
-            <SelectValue />
+            <SelectValue>{(value) => URGENSI_LABELS[value] ?? value}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="biasa">Biasa</SelectItem>

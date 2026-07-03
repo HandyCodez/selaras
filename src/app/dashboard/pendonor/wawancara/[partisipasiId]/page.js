@@ -4,15 +4,14 @@ import { connectDB } from "@/lib/db";
 import { Partisipasi } from "@/lib/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { StatusBadge } from "@/components/shared/status-badge";
-
-function Field({ label, value }) {
-  return (
-    <div className="flex justify-between border-b py-2 text-sm last:border-0">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium">{value}</span>
-    </div>
-  );
-}
+import { DetailField } from "@/components/shared/detail-field";
+import {
+  ActivityIcon,
+  ScaleIcon,
+  DropletIcon,
+  NotebookPenIcon,
+  ClockIcon,
+} from "lucide-react";
 
 export default async function WawancaraViewPage({ params }) {
   const { partisipasiId } = await params;
@@ -38,11 +37,16 @@ export default async function WawancaraViewPage({ params }) {
         <div className="mb-4">
           <StatusBadge status={partisipasi.status} />
         </div>
-        <Field label="Tensi" value={`${w.tensiSistol}/${w.tensiDiastol}`} />
-        <Field label="Berat Badan" value={`${w.beratBadan} kg`} />
-        <Field label="Hemoglobin" value={`${w.hemoglobin} g/dL`} />
-        <Field label="Catatan" value={w.catatan || "-"} />
-        <Field
+        <DetailField
+          icon={ActivityIcon}
+          label="Tensi"
+          value={`${w.tensiSistol}/${w.tensiDiastol}`}
+        />
+        <DetailField icon={ScaleIcon} label="Berat Badan" value={`${w.beratBadan} kg`} />
+        <DetailField icon={DropletIcon} label="Hemoglobin" value={`${w.hemoglobin} g/dL`} />
+        <DetailField icon={NotebookPenIcon} label="Catatan" value={w.catatan || "-"} />
+        <DetailField
+          icon={ClockIcon}
           label="Waktu Wawancara"
           value={new Date(w.interviewedAt).toLocaleString("id-ID")}
         />

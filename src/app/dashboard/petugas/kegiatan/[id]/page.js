@@ -16,6 +16,7 @@ import {
 import { StatusBadge } from "@/components/shared/status-badge";
 import { KegiatanStatusActions } from "@/components/petugas/kegiatan-status-actions";
 import { CopyKegiatanLink } from "@/components/petugas/copy-kegiatan-link";
+import { formatRentangWaktu } from "@/lib/format";
 
 export default async function KegiatanDetailPage({ params }) {
   const { id } = await params;
@@ -40,7 +41,7 @@ export default async function KegiatanDetailPage({ params }) {
           <h1 className="text-2xl font-semibold">{kegiatan.judul}</h1>
           <p className="text-muted-foreground">
             {kegiatan.lokasi} &middot;{" "}
-            {new Date(kegiatan.tanggalMulai).toLocaleString("id-ID")} &middot; Kuota{" "}
+            {formatRentangWaktu(kegiatan.tanggalMulai, kegiatan.tanggalSelesai)} &middot; Kuota{" "}
             {partisipasiList.length}/{kegiatan.kuota}
           </p>
         </div>

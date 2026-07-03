@@ -12,6 +12,11 @@ import {
 } from "@/components/ui/select";
 import { SubmitButton } from "@/components/forms/submit-button";
 
+const JABATAN_LABELS = {
+  staff: "Staff",
+  dokter: "Dokter",
+};
+
 export function PetugasAccountForm({ action, cabangList, petugas }) {
   const [state, formAction] = useActionState(action, null);
   const isEdit = Boolean(petugas);
@@ -40,7 +45,12 @@ export function PetugasAccountForm({ action, cabangList, petugas }) {
           required
         >
           <SelectTrigger id="cabangId" className="w-full">
-            <SelectValue placeholder="Pilih cabang" />
+            <SelectValue placeholder="Pilih cabang">
+              {(value) => {
+                const cabang = cabangList.find((c) => c._id === value);
+                return cabang ? `${cabang.nama} - ${cabang.kota}` : "Pilih cabang";
+              }}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {cabangList.map((c) => (
@@ -55,7 +65,7 @@ export function PetugasAccountForm({ action, cabangList, petugas }) {
         <Label htmlFor="jabatan">Jabatan</Label>
         <Select name="jabatan" defaultValue={petugas?.petugas?.jabatan || "staff"} required>
           <SelectTrigger id="jabatan" className="w-full">
-            <SelectValue />
+            <SelectValue>{(value) => JABATAN_LABELS[value] ?? value}</SelectValue>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="staff">Staff</SelectItem>

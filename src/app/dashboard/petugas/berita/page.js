@@ -32,6 +32,7 @@ export default async function PetugasBeritaPage() {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Sampul</TableHead>
             <TableHead>Judul</TableHead>
             <TableHead>Status</TableHead>
             <TableHead />
@@ -40,6 +41,14 @@ export default async function PetugasBeritaPage() {
         <TableBody>
           {beritaList.map((b) => (
             <TableRow key={b._id}>
+              <TableCell>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={b.coverImage || "/placeholder-berita.svg"}
+                  alt={b.judul}
+                  className="size-10 rounded-md object-cover"
+                />
+              </TableCell>
               <TableCell className="font-medium">{b.judul}</TableCell>
               <TableCell>
                 <StatusBadge status={b.status} />
@@ -62,7 +71,7 @@ export default async function PetugasBeritaPage() {
           ))}
           {beritaList.length === 0 && (
             <TableRow>
-              <TableCell colSpan={3} className="text-center text-muted-foreground">
+              <TableCell colSpan={4} className="text-center text-muted-foreground">
                 Belum ada berita.
               </TableCell>
             </TableRow>

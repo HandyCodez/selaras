@@ -15,6 +15,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { PlusIcon } from "lucide-react";
 import { KegiatanStatusActions } from "@/components/petugas/kegiatan-status-actions";
 import { DeleteKegiatanButton } from "@/components/petugas/delete-kegiatan-button";
+import { formatRentangWaktu } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const STATUS_FILTERS = [
@@ -78,7 +79,7 @@ export default async function PetugasKegiatanPage({ searchParams }) {
           <TableRow>
             <TableHead>Judul</TableHead>
             <TableHead>Lokasi</TableHead>
-            <TableHead>Tanggal Mulai</TableHead>
+            <TableHead>Waktu</TableHead>
             <TableHead>Terisi</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Untuk</TableHead>
@@ -90,7 +91,7 @@ export default async function PetugasKegiatanPage({ searchParams }) {
             <TableRow key={k._id}>
               <TableCell className="font-medium">{k.judul}</TableCell>
               <TableCell>{k.lokasi}</TableCell>
-              <TableCell>{new Date(k.tanggalMulai).toLocaleString("id-ID")}</TableCell>
+              <TableCell>{formatRentangWaktu(k.tanggalMulai, k.tanggalSelesai)}</TableCell>
               <TableCell>
                 {terisiMap[k._id.toString()] || 0}/{k.kuota}
               </TableCell>

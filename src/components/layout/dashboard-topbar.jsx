@@ -1,9 +1,9 @@
 "use client";
 
-import { logout } from "@/actions/auth.actions";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOutIcon, MenuIcon } from "lucide-react";
+import { MenuIcon } from "lucide-react";
 import { ROLE_LABELS } from "@/components/layout/role-nav-items";
 
 export function DashboardTopbar({ nama, role, onMenuClick }) {
@@ -26,21 +26,23 @@ export function DashboardTopbar({ nama, role, onMenuClick }) {
         >
           <MenuIcon className="size-5" />
         </Button>
+        <Image
+          src="/logo.jpeg"
+          alt="Selaras"
+          width={374}
+          height={331}
+          className="size-8 shrink-0 rounded-full object-cover"
+        />
         <span className="font-semibold">Selaras</span>
       </div>
-      <div className="flex items-center gap-3">
-        <Avatar className="size-8">
+      <div className="flex items-center gap-2">
+        <Avatar className="size-8 shrink-0">
           <AvatarFallback>{initials}</AvatarFallback>
         </Avatar>
-        <div className="hidden text-sm sm:block">
+        <div className="hidden text-left text-sm sm:block">
           <p className="font-medium leading-none">{nama}</p>
           <p className="text-muted-foreground">{ROLE_LABELS[role]}</p>
         </div>
-        <form action={logout}>
-          <Button variant="ghost" size="icon" type="submit" title="Keluar">
-            <LogOutIcon className="size-4" />
-          </Button>
-        </form>
       </div>
     </header>
   );
