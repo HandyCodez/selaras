@@ -23,10 +23,6 @@ export function EditPetugasProfileForm({ user }) {
         <Label htmlFor="email">Email (opsional)</Label>
         <Input id="email" name="email" type="email" defaultValue={user.email} />
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="password">Kata Sandi Baru (kosongkan jika tidak diubah)</Label>
-        <Input id="password" name="password" type="password" minLength={6} />
-      </div>
       {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
       <SubmitButton>Simpan Perubahan</SubmitButton>
     </form>

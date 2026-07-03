@@ -6,18 +6,18 @@ import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { User } from "@/lib/models";
 import { requireRole } from "@/lib/auth";
-import { hashPassword } from "@/lib/password";
 
 const updateProfileSchema = z.object({
   nama: z.string().min(1),
   telepon: z.string().min(8, "Nomor HP tidak valid."),
   email: z.string().email().optional().or(z.literal("")),
-  password: z.string().optional().or(z.literal("")),
 });
 
 // Self-service profile edit for petugas — deliberately does not touch
 // cabangId/jabatan, since those are organizational assignments only admin
-// controls (see petugas-account.actions.js).
+// controls (see petugas-account.actions.js). Password changes go through the
+// dedicated changePassword action (see password.actions.js), which verifies
+// the current password first.
 export async function updatePetugasProfile(prevState, formData) {
   const session = await requireRole("petugas");
   const parsed = updateProfileSchema.safeParse(Object.fromEntries(formData.entries()));
@@ -48,12 +48,6 @@ export async function updatePetugasProfile(prevState, formData) {
     };
   }
 
-  if (data.password) {
-    if (data.password.length < 6) {
-      return { error: "Kata sandi baru minimal 6 karakter." };
-    }
-    user.passwordHash = await hashPassword(data.password);
-  }
   user.nama = data.nama;
   user.telepon = data.telepon;
   if (data.email) user.email = data.email.toLowerCase();

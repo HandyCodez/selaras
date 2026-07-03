@@ -5,6 +5,7 @@ import { DonorQrDisplay } from "@/components/qr/donor-qr-display";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DetailField } from "@/components/shared/detail-field";
+import { ChangePasswordForm } from "@/components/forms/change-password-form";
 import { isPendonorProfileComplete } from "@/lib/pendonor";
 import {
   IdCardIcon,
@@ -14,6 +15,7 @@ import {
   UsersIcon,
   MapPinIcon,
   DropletIcon,
+  KeyRoundIcon,
 } from "lucide-react";
 
 function jenisKelaminLabel(jk) {
@@ -89,6 +91,17 @@ export default async function PendonorAkunPage() {
             label="Alamat"
             value={user.pendonor?.alamat || "-"}
           />
+        </CardContent>
+      </Card>
+      <Card className="sm:col-span-2">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <KeyRoundIcon className="size-5 text-rose-600" />
+            Ubah Kata Sandi
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ChangePasswordForm />
         </CardContent>
       </Card>
     </div>

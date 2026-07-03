@@ -55,3 +55,9 @@ export const ROLE_LABELS = {
   rumah_sakit: "Rumah Sakit",
   admin: "Admin",
 };
+
+export const ACCOUNT_HREF = {
+  pendonor: "/dashboard/pendonor/akun",
+  petugas: "/dashboard/petugas/akun",
+  rumah_sakit: "/dashboard/rumah-sakit/akun",
+};
