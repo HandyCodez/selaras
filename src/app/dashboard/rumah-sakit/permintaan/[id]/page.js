@@ -12,7 +12,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { PageHeaderIcon } from "@/components/shared/page-header-icon";
 import { CancelPermintaanButton } from "@/components/rumah-sakit/cancel-permintaan-button";
+import { Building2Icon, DropletIcon, NotebookPenIcon } from "lucide-react";
 
 export default async function RumahSakitPermintaanDetailPage({ params }) {
   const { id } = await params;
@@ -34,19 +36,19 @@ export default async function RumahSakitPermintaanDetailPage({ params }) {
 
   return (
     <div className="max-w-xl space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Detail Permintaan</h1>
-          <p className="text-muted-foreground">
-            {permintaan.cabangId?.nama} - {permintaan.cabangId?.kota}
-          </p>
-        </div>
-        <StatusBadge status={permintaan.status} />
-      </div>
+      <PageHeaderIcon
+        icon={Building2Icon}
+        title="Detail Permintaan"
+        description={`${permintaan.cabangId?.nama} - ${permintaan.cabangId?.kota}`}
+        action={<StatusBadge status={permintaan.status} />}
+      />
 
       <Card>
         <CardHeader>
-          <CardTitle>Item Diminta</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <DropletIcon className="size-4 text-rose-600" />
+            Item Diminta
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
@@ -73,7 +75,10 @@ export default async function RumahSakitPermintaanDetailPage({ params }) {
       {permintaan.catatan && (
         <Card>
           <CardHeader>
-            <CardTitle>Catatan Anda</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <NotebookPenIcon className="size-4 text-rose-600" />
+              Catatan Anda
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
             {permintaan.catatan}
@@ -84,7 +89,10 @@ export default async function RumahSakitPermintaanDetailPage({ params }) {
       {permintaan.catatanPetugas && (
         <Card>
           <CardHeader>
-            <CardTitle>Catatan dari Petugas PMI</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <NotebookPenIcon className="size-4 text-rose-600" />
+              Catatan dari Petugas PMI
+            </CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-muted-foreground">
             {permintaan.catatanPetugas}

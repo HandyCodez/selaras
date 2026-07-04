@@ -1,4 +1,5 @@
 import Link from "next/link";
+import mongoose from "mongoose";
 import { requireRole } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { PermintaanDarah } from "@/lib/models";
@@ -44,7 +45,7 @@ export default async function PetugasPermintaanPage({ searchParams }) {
       .sort({ createdAt: -1 })
       .lean(),
     PermintaanDarah.aggregate([
-      { $match: { cabangId: session.cabangId } },
+      { $match: { cabangId: new mongoose.Types.ObjectId(session.cabangId) } },
       {
         $facet: {
           byStatus: [{ $group: { _id: "$status", count: { $sum: 1 } } }],

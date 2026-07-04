@@ -4,15 +4,14 @@ import { connectDB } from "@/lib/db";
 import { RumahSakit } from "@/lib/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-function Field({ label, value }) {
-  return (
-    <div className="flex justify-between border-b py-2 text-sm last:border-0">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium">{value}</span>
-    </div>
-  );
-}
+import { DetailField } from "@/components/shared/detail-field";
+import {
+  UserRoundIcon,
+  MailIcon,
+  PhoneIcon,
+  Building2Icon,
+  MapPinIcon,
+} from "lucide-react";
 
 export default async function RumahSakitAkunPage() {
   const user = await requireCurrentUser();
@@ -32,23 +31,41 @@ export default async function RumahSakitAkunPage() {
       <div className="grid max-w-3xl gap-6 sm:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Data PIC</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <UserRoundIcon className="size-5 text-rose-600" />
+              Data PIC
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <Field label="Nama" value={user.nama} />
-            <Field label="Email" value={user.email || "-"} />
-            <Field label="Telepon" value={user.telepon} />
+            <DetailField icon={UserRoundIcon} label="Nama" value={user.nama} />
+            <DetailField icon={MailIcon} label="Email" value={user.email || "-"} />
+            <DetailField icon={PhoneIcon} label="Telepon" value={user.telepon} />
           </CardContent>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Data Rumah Sakit</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Building2Icon className="size-5 text-rose-600" />
+              Data Rumah Sakit
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <Field label="Nama Rumah Sakit" value={rumahSakit?.nama} />
-            <Field label="Kota" value={rumahSakit?.kota} />
-            <Field label="Alamat" value={rumahSakit?.alamat || "-"} />
-            <Field label="Telepon RS" value={rumahSakit?.telepon || "-"} />
+            <DetailField
+              icon={Building2Icon}
+              label="Nama Rumah Sakit"
+              value={rumahSakit?.nama}
+            />
+            <DetailField icon={MapPinIcon} label="Kota" value={rumahSakit?.kota} />
+            <DetailField
+              icon={MapPinIcon}
+              label="Alamat"
+              value={rumahSakit?.alamat || "-"}
+            />
+            <DetailField
+              icon={PhoneIcon}
+              label="Telepon RS"
+              value={rumahSakit?.telepon || "-"}
+            />
           </CardContent>
         </Card>
       </div>

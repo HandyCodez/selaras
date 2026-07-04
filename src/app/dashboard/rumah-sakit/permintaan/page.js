@@ -3,6 +3,7 @@ import { requireCurrentUser } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { PermintaanDarah } from "@/lib/models";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -12,8 +13,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { PlusIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { StatCard } from "@/components/shared/stat-card";
+import { FilterTabs } from "@/components/shared/filter-tabs";
+import { EmptyState } from "@/components/shared/empty-state";
+import {
+  PlusIcon,
+  ClipboardListIcon,
+  TriangleAlertIcon,
+  CheckCircle2Icon,
+} from "lucide-react";
 
 const STATUS_FILTERS = [
   { value: "", label: "Semua" },
@@ -36,10 +44,30 @@ export default async function RumahSakitPermintaanPage({ searchParams }) {
   const filter = { rumahSakitId: user.rumahSakit.rumahSakitId };
   if (status) filter.status = status;
 
-  const permintaanList = await PermintaanDarah.find(filter)
-    .populate("cabangId", "nama kota")
-    .sort({ createdAt: -1 })
-    .lean();
+  const [permintaanList, [stats]] = await Promise.all([
+    PermintaanDarah.find(filter)
+      .populate("cabangId", "nama kota")
+      .sort({ createdAt: -1 })
+      .lean(),
+    PermintaanDarah.aggregate([
+      { $match: { rumahSakitId: user.rumahSakit.rumahSakitId } },
+      {
+        $facet: {
+          byStatus: [{ $group: { _id: "$status", count: { $sum: 1 } } }],
+          mendesakMenunggu: [
+            { $match: { status: "menunggu", urgensi: "mendesak" } },
+            { $count: "count" },
+          ],
+        },
+      },
+    ]),
+  ]);
+  const countByStatus = Object.fromEntries(
+    stats.byStatus.map((s) => [s._id, s.count]),
+  );
+  const menungguCount = countByStatus.menunggu || 0;
+  const mendesakCount = stats.mendesakMenunggu[0]?.count || 0;
+  const selesaiCount = countByStatus.selesai || 0;
 
   return (
     <div className="space-y-6">
@@ -50,67 +78,84 @@ export default async function RumahSakitPermintaanPage({ searchParams }) {
           Ajukan Permintaan
         </Button>
       </div>
-      <div className="flex flex-wrap gap-2">
-        {STATUS_FILTERS.map((f) => (
-          <Link
-            key={f.value}
-            href={
-              f.value
-                ? `/dashboard/rumah-sakit/permintaan?status=${f.value}`
-                : "/dashboard/rumah-sakit/permintaan"
-            }
-            className={cn(
-              "rounded-md border px-3 py-1.5 text-sm",
-              (status || "") === f.value
-                ? "border-primary bg-primary text-primary-foreground"
-                : "text-muted-foreground",
-            )}
-          >
-            {f.label}
-          </Link>
-        ))}
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard
+          icon={ClipboardListIcon}
+          color={menungguCount > 0 ? "amber" : "emerald"}
+          label="Menunggu"
+          value={menungguCount}
+        />
+        <StatCard
+          icon={TriangleAlertIcon}
+          color={mendesakCount > 0 ? "rose" : "emerald"}
+          label="Mendesak"
+          value={mendesakCount}
+        />
+        <StatCard icon={CheckCircle2Icon} color="emerald" label="Selesai" value={selesaiCount} />
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Cabang PMI</TableHead>
-            <TableHead>Jumlah Item</TableHead>
-            <TableHead>Urgensi</TableHead>
-            <TableHead>Tanggal</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {permintaanList.map((p) => (
-            <TableRow key={p._id}>
-              <TableCell>{p.cabangId?.nama}</TableCell>
-              <TableCell>{p.items.length} golongan darah</TableCell>
-              <TableCell className="capitalize">{p.urgensi}</TableCell>
-              <TableCell>{new Date(p.createdAt).toLocaleDateString("id-ID")}</TableCell>
-              <TableCell>
-                <StatusBadge status={p.status} />
-              </TableCell>
-              <TableCell>
-                <Button
-                  render={<Link href={`/dashboard/rumah-sakit/permintaan/${p._id}`} />}
-                  variant="ghost"
-                  size="sm"
-                >
-                  Detail
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-          {permintaanList.length === 0 && (
+
+      <FilterTabs
+        options={STATUS_FILTERS}
+        activeValue={status}
+        baseHref="/dashboard/rumah-sakit/permintaan"
+      />
+
+      {permintaanList.length === 0 ? (
+        <EmptyState
+          icon={ClipboardListIcon}
+          title="Belum ada permintaan darah"
+          description="Permintaan darah yang kamu ajukan akan muncul di sini."
+        />
+      ) : (
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground">
-                Belum ada permintaan darah.
-              </TableCell>
+              <TableHead>Cabang PMI</TableHead>
+              <TableHead>Jumlah Item</TableHead>
+              <TableHead>Urgensi</TableHead>
+              <TableHead>Tanggal</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead />
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {permintaanList.map((p) => (
+              <TableRow
+                key={p._id}
+                className={
+                  p.urgensi === "mendesak" && p.status === "menunggu"
+                    ? "bg-destructive/5"
+                    : undefined
+                }
+              >
+                <TableCell>{p.cabangId?.nama}</TableCell>
+                <TableCell>{p.items.length} golongan darah</TableCell>
+                <TableCell>
+                  {p.urgensi === "mendesak" ? (
+                    <Badge variant="destructive">Mendesak</Badge>
+                  ) : (
+                    <Badge variant="secondary">Biasa</Badge>
+                  )}
+                </TableCell>
+                <TableCell>{new Date(p.createdAt).toLocaleDateString("id-ID")}</TableCell>
+                <TableCell>
+                  <StatusBadge status={p.status} />
+                </TableCell>
+                <TableCell>
+                  <Button
+                    render={<Link href={`/dashboard/rumah-sakit/permintaan/${p._id}`} />}
+                    variant="ghost"
+                    size="sm"
+                  >
+                    Detail
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 }

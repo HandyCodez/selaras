@@ -1,4 +1,5 @@
 import Link from "next/link";
+import mongoose from "mongoose";
 import { requireRole } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Kegiatan, Partisipasi } from "@/lib/models";
@@ -39,7 +40,7 @@ export default async function PetugasKegiatanPage({ searchParams }) {
   const [kegiatanList, statusCounts] = await Promise.all([
     Kegiatan.find(filter).sort({ tanggalMulai: -1 }).lean(),
     Kegiatan.aggregate([
-      { $match: { cabangId: session.cabangId } },
+      { $match: { cabangId: new mongoose.Types.ObjectId(session.cabangId) } },
       { $group: { _id: "$status", count: { $sum: 1 } } },
     ]),
   ]);

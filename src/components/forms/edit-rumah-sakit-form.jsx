@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SubmitButton } from "@/components/forms/submit-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { UserRoundIcon, Building2Icon } from "lucide-react";
 
 export function EditRumahSakitForm({ user, rumahSakit }) {
   const [state, formAction] = useActionState(updateRumahSakitProfile, null);
@@ -14,7 +15,10 @@ export function EditRumahSakitForm({ user, rumahSakit }) {
     <form action={formAction} className="max-w-md space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Data PIC</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <UserRoundIcon className="size-4 text-rose-600" />
+            Data PIC
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -34,7 +38,10 @@ export function EditRumahSakitForm({ user, rumahSakit }) {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Data Rumah Sakit</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Building2Icon className="size-4 text-rose-600" />
+            Data Rumah Sakit
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
