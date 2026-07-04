@@ -10,6 +10,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { EmptyState } from "@/components/shared/empty-state";
+import { PageHeaderIcon } from "@/components/shared/page-header-icon";
+import { HistoryIcon } from "lucide-react";
 
 const ALASAN_LABELS = {
   donasi_selesai: "Donor Selesai",
@@ -29,42 +32,43 @@ export default async function RiwayatStokPage() {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <h1 className="text-2xl font-semibold">Riwayat Stok Darah</h1>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Tanggal</TableHead>
-            <TableHead>Golongan</TableHead>
-            <TableHead>Perubahan</TableHead>
-            <TableHead>Alasan</TableHead>
-            <TableHead>Oleh</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {logs.map((log) => (
-            <TableRow key={log._id}>
-              <TableCell>
-                {new Date(log.createdAt).toLocaleString("id-ID")}
-              </TableCell>
-              <TableCell className="font-medium">{log.golonganDarah}</TableCell>
-              <TableCell>
-                <Badge variant={log.delta > 0 ? "default" : "destructive"}>
-                  {log.delta > 0 ? `+${log.delta}` : log.delta}
-                </Badge>
-              </TableCell>
-              <TableCell>{ALASAN_LABELS[log.alasan] || log.alasan}</TableCell>
-              <TableCell>{log.actorId?.nama || "-"}</TableCell>
-            </TableRow>
-          ))}
-          {logs.length === 0 && (
+      <PageHeaderIcon icon={HistoryIcon} title="Riwayat Stok Darah" />
+      {logs.length === 0 ? (
+        <EmptyState
+          icon={HistoryIcon}
+          title="Belum ada riwayat perubahan stok"
+          description="Setiap penambahan atau pengurangan stok darah akan tercatat di sini."
+        />
+      ) : (
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={5} className="text-center text-muted-foreground">
-                Belum ada riwayat perubahan stok.
-              </TableCell>
+              <TableHead>Tanggal</TableHead>
+              <TableHead>Golongan</TableHead>
+              <TableHead>Perubahan</TableHead>
+              <TableHead>Alasan</TableHead>
+              <TableHead>Oleh</TableHead>
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {logs.map((log) => (
+              <TableRow key={log._id}>
+                <TableCell>
+                  {new Date(log.createdAt).toLocaleString("id-ID")}
+                </TableCell>
+                <TableCell className="font-medium">{log.golonganDarah}</TableCell>
+                <TableCell>
+                  <Badge variant={log.delta > 0 ? "default" : "destructive"}>
+                    {log.delta > 0 ? `+${log.delta}` : log.delta}
+                  </Badge>
+                </TableCell>
+                <TableCell>{ALASAN_LABELS[log.alasan] || log.alasan}</TableCell>
+                <TableCell>{log.actorId?.nama || "-"}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 }

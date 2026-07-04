@@ -3,13 +3,9 @@ import { GOLONGAN_DARAH } from "../blood-types.js";
 
 const KuesionerSchema = new mongoose.Schema(
   {
-    beratBadan: { type: Number },
-    tekananDarahDiketahui: { type: String, default: "" },
-    riwayatPenyakit: { type: [String], default: [] },
-    sedangMinumObat: { type: Boolean, default: false },
-    detailObat: { type: String, default: "" },
-    donorTerakhir: { type: Date },
-    kondisiSehat: { type: Boolean, default: true },
+    // Keyed by question id from src/lib/kuesioner-questions.js -> boolean answer.
+    jawaban: { type: mongoose.Schema.Types.Mixed, default: () => ({}) },
+    kehamilanKe: { type: Number },
     catatanTambahan: { type: String, default: "" },
     submittedAt: { type: Date, default: Date.now },
   },

@@ -126,7 +126,10 @@ export default async function PendonorKegiatanDetailPage({ params }) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <KuesionerForm kegiatanId={id} />
+            <KuesionerForm
+              kegiatanId={id}
+              jenisKelamin={donor.pendonor?.jenisKelamin}
+            />
           </CardContent>
         </Card>
       )}

@@ -13,7 +13,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { cn } from "@/lib/utils";
+import { StatCard } from "@/components/shared/stat-card";
+import { FilterTabs } from "@/components/shared/filter-tabs";
+import { EmptyState } from "@/components/shared/empty-state";
+import {
+  ClipboardListIcon,
+  TriangleAlertIcon,
+  CheckCircle2Icon,
+} from "lucide-react";
 
 const STATUS_FILTERS = [
   { value: "", label: "Semua" },
@@ -31,10 +38,30 @@ export default async function PetugasPermintaanPage({ searchParams }) {
   const filter = { cabangId: session.cabangId };
   if (status) filter.status = status;
 
-  const permintaanList = await PermintaanDarah.find(filter)
-    .populate("rumahSakitId", "nama kota")
-    .sort({ createdAt: -1 })
-    .lean();
+  const [permintaanList, [stats]] = await Promise.all([
+    PermintaanDarah.find(filter)
+      .populate("rumahSakitId", "nama kota")
+      .sort({ createdAt: -1 })
+      .lean(),
+    PermintaanDarah.aggregate([
+      { $match: { cabangId: session.cabangId } },
+      {
+        $facet: {
+          byStatus: [{ $group: { _id: "$status", count: { $sum: 1 } } }],
+          mendesakMenunggu: [
+            { $match: { status: "menunggu", urgensi: "mendesak" } },
+            { $count: "count" },
+          ],
+        },
+      },
+    ]),
+  ]);
+  const countByStatus = Object.fromEntries(
+    stats.byStatus.map((s) => [s._id, s.count]),
+  );
+  const menungguCount = countByStatus.menunggu || 0;
+  const mendesakCount = stats.mendesakMenunggu[0]?.count || 0;
+  const selesaiCount = countByStatus.selesai || 0;
 
   // Surface what needs attention first: still-pending requests, mendesak
   // ones ahead of biasa within that group.
@@ -50,80 +77,84 @@ export default async function PetugasPermintaanPage({ searchParams }) {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold">Permintaan Darah</h1>
-      <div className="flex flex-wrap gap-2">
-        {STATUS_FILTERS.map((f) => (
-          <Link
-            key={f.value}
-            href={
-              f.value
-                ? `/dashboard/petugas/permintaan?status=${f.value}`
-                : "/dashboard/petugas/permintaan"
-            }
-            className={cn(
-              "rounded-md border px-3 py-1.5 text-sm",
-              (status || "") === f.value
-                ? "border-primary bg-primary text-primary-foreground"
-                : "text-muted-foreground",
-            )}
-          >
-            {f.label}
-          </Link>
-        ))}
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard
+          icon={ClipboardListIcon}
+          color={menungguCount > 0 ? "amber" : "emerald"}
+          label="Menunggu"
+          value={menungguCount}
+        />
+        <StatCard
+          icon={TriangleAlertIcon}
+          color={mendesakCount > 0 ? "rose" : "emerald"}
+          label="Mendesak"
+          value={mendesakCount}
+        />
+        <StatCard icon={CheckCircle2Icon} color="emerald" label="Selesai" value={selesaiCount} />
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Rumah Sakit</TableHead>
-            <TableHead>Jumlah Item</TableHead>
-            <TableHead>Urgensi</TableHead>
-            <TableHead>Tanggal</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {permintaanList.map((p) => (
-            <TableRow
-              key={p._id}
-              className={
-                p.urgensi === "mendesak" && p.status === "menunggu"
-                  ? "bg-destructive/5"
-                  : undefined
-              }
-            >
-              <TableCell>{p.rumahSakitId?.nama}</TableCell>
-              <TableCell>{p.items.length} golongan darah</TableCell>
-              <TableCell>
-                {p.urgensi === "mendesak" ? (
-                  <Badge variant="destructive">Mendesak</Badge>
-                ) : (
-                  <Badge variant="secondary">Biasa</Badge>
-                )}
-              </TableCell>
-              <TableCell>{new Date(p.createdAt).toLocaleDateString("id-ID")}</TableCell>
-              <TableCell>
-                <StatusBadge status={p.status} />
-              </TableCell>
-              <TableCell>
-                <Button
-                  render={<Link href={`/dashboard/petugas/permintaan/${p._id}`} />}
-                  variant="ghost"
-                  size="sm"
-                >
-                  Detail
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-          {permintaanList.length === 0 && (
+
+      <FilterTabs
+        options={STATUS_FILTERS}
+        activeValue={status}
+        baseHref="/dashboard/petugas/permintaan"
+      />
+
+      {permintaanList.length === 0 ? (
+        <EmptyState
+          icon={ClipboardListIcon}
+          title="Belum ada permintaan darah"
+          description="Permintaan darah dari rumah sakit akan muncul di sini."
+        />
+      ) : (
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={6} className="text-center text-muted-foreground">
-                Belum ada permintaan darah dari rumah sakit.
-              </TableCell>
+              <TableHead>Rumah Sakit</TableHead>
+              <TableHead>Jumlah Item</TableHead>
+              <TableHead>Urgensi</TableHead>
+              <TableHead>Tanggal</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead />
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {permintaanList.map((p) => (
+              <TableRow
+                key={p._id}
+                className={
+                  p.urgensi === "mendesak" && p.status === "menunggu"
+                    ? "bg-destructive/5"
+                    : undefined
+                }
+              >
+                <TableCell>{p.rumahSakitId?.nama}</TableCell>
+                <TableCell>{p.items.length} golongan darah</TableCell>
+                <TableCell>
+                  {p.urgensi === "mendesak" ? (
+                    <Badge variant="destructive">Mendesak</Badge>
+                  ) : (
+                    <Badge variant="secondary">Biasa</Badge>
+                  )}
+                </TableCell>
+                <TableCell>{new Date(p.createdAt).toLocaleDateString("id-ID")}</TableCell>
+                <TableCell>
+                  <StatusBadge status={p.status} />
+                </TableCell>
+                <TableCell>
+                  <Button
+                    render={<Link href={`/dashboard/petugas/permintaan/${p._id}`} />}
+                    variant="ghost"
+                    size="sm"
+                  >
+                    Detail
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 }

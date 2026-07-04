@@ -2,6 +2,9 @@ import { requireRole } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Kegiatan } from "@/lib/models";
 import { WawancaraPanel } from "@/components/petugas/wawancara-panel";
+import { EmptyState } from "@/components/shared/empty-state";
+import { PageHeaderIcon } from "@/components/shared/page-header-icon";
+import { StethoscopeIcon, CalendarHeartIcon } from "lucide-react";
 
 export default async function WawancaraPage() {
   const session = await requireRole("petugas");
@@ -16,12 +19,20 @@ export default async function WawancaraPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Wawancara Medis</h1>
-      <p className="text-muted-foreground">
-        Pindai QR Code pendonor yang sudah check-in untuk melakukan wawancara
-        kelayakan donor.
-      </p>
-      <WawancaraPanel kegiatanList={kegiatanList} />
+      <PageHeaderIcon
+        icon={StethoscopeIcon}
+        title="Wawancara Medis"
+        description="Pindai QR Code pendonor yang sudah check-in untuk melakukan wawancara kelayakan donor."
+      />
+      {kegiatanList.length === 0 ? (
+        <EmptyState
+          icon={CalendarHeartIcon}
+          title="Belum ada kegiatan aktif"
+          description="Buat atau aktifkan kegiatan donor darah terlebih dahulu sebelum bisa melakukan wawancara."
+        />
+      ) : (
+        <WawancaraPanel kegiatanList={kegiatanList} />
+      )}
     </div>
   );
 }

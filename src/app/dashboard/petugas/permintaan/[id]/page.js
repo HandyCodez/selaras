@@ -4,8 +4,12 @@ import { connectDB } from "@/lib/db";
 import { PermintaanDarah } from "@/lib/models";
 import { getStokByCabang } from "@/actions/stok.actions";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { DetailField } from "@/components/shared/detail-field";
+import { PageHeaderIcon } from "@/components/shared/page-header-icon";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
 import { PermintaanConfirmPanel } from "@/components/petugas/permintaan-confirm-panel";
+import { Building2Icon, MapPinIcon, NotebookPenIcon } from "lucide-react";
 
 export default async function PetugasPermintaanDetailPage({ params }) {
   const { id } = await params;
@@ -25,21 +29,35 @@ export default async function PetugasPermintaanDetailPage({ params }) {
 
   return (
     <div className="max-w-2xl space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">{permintaan.rumahSakitId?.nama}</h1>
-          <p className="text-muted-foreground">{permintaan.rumahSakitId?.alamat}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          {permintaan.urgensi === "mendesak" && (
-            <Badge variant="destructive">Mendesak</Badge>
-          )}
-          <StatusBadge status={permintaan.status} />
-        </div>
-      </div>
+      <PageHeaderIcon
+        icon={Building2Icon}
+        title={permintaan.rumahSakitId?.nama}
+        description={
+          <span className="flex items-center gap-1.5 text-sm">
+            <MapPinIcon className="size-3.5 shrink-0" />
+            {permintaan.rumahSakitId?.alamat}
+          </span>
+        }
+        action={
+          <div className="flex items-center gap-2">
+            {permintaan.urgensi === "mendesak" && (
+              <Badge variant="destructive">Mendesak</Badge>
+            )}
+            <StatusBadge status={permintaan.status} />
+          </div>
+        }
+      />
 
       {permintaan.catatan && (
-        <p className="text-sm text-muted-foreground">Catatan RS: {permintaan.catatan}</p>
+        <Card>
+          <CardContent className="pt-6">
+            <DetailField
+              icon={NotebookPenIcon}
+              label="Catatan RS"
+              value={permintaan.catatan}
+            />
+          </CardContent>
+        </Card>
       )}
 
       {permintaan.status === "menunggu" ? (
@@ -48,14 +66,18 @@ export default async function PetugasPermintaanDetailPage({ params }) {
           stokMap={stokMap}
         />
       ) : (
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">Permintaan ini sudah diproses.</p>
-          {permintaan.catatanPetugas && (
-            <p className="text-sm text-muted-foreground">
-              Catatan Anda: {permintaan.catatanPetugas}
-            </p>
-          )}
-        </div>
+        <Card>
+          <CardContent className="space-y-1 pt-6">
+            <p className="text-sm text-muted-foreground">Permintaan ini sudah diproses.</p>
+            {permintaan.catatanPetugas && (
+              <DetailField
+                icon={NotebookPenIcon}
+                label="Catatan Anda"
+                value={permintaan.catatanPetugas}
+              />
+            )}
+          </CardContent>
+        </Card>
       )}
     </div>
   );

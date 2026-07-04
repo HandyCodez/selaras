@@ -14,9 +14,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/shared/status-badge";
+import { CapacityBar } from "@/components/shared/capacity-bar";
+import { EmptyState } from "@/components/shared/empty-state";
 import { KegiatanStatusActions } from "@/components/petugas/kegiatan-status-actions";
 import { CopyKegiatanLink } from "@/components/petugas/copy-kegiatan-link";
 import { formatRentangWaktu } from "@/lib/format";
+import { MapPinIcon, CalendarDaysIcon, UsersIcon, LinkIcon } from "lucide-react";
 
 export default async function KegiatanDetailPage({ params }) {
   const { id } = await params;
@@ -36,14 +39,24 @@ export default async function KegiatanDetailPage({ params }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">{kegiatan.judul}</h1>
-          <p className="text-muted-foreground">
-            {kegiatan.lokasi} &middot;{" "}
-            {formatRentangWaktu(kegiatan.tanggalMulai, kegiatan.tanggalSelesai)} &middot; Kuota{" "}
-            {partisipasiList.length}/{kegiatan.kuota}
-          </p>
+          <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+            <p className="flex items-center gap-1.5">
+              <MapPinIcon className="size-4 shrink-0" />
+              {kegiatan.lokasi}
+            </p>
+            <p className="flex items-center gap-1.5">
+              <CalendarDaysIcon className="size-4 shrink-0" />
+              {formatRentangWaktu(kegiatan.tanggalMulai, kegiatan.tanggalSelesai)}
+            </p>
+          </div>
+          <CapacityBar
+            terisi={partisipasiList.length}
+            kuota={kegiatan.kuota}
+            className="mt-3 max-w-xs"
+          />
         </div>
         <div className="flex items-center gap-2">
           <StatusBadge status={kegiatan.status} />
@@ -68,7 +81,10 @@ export default async function KegiatanDetailPage({ params }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Link Kegiatan untuk Pendonor</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <LinkIcon className="size-4 text-rose-600" />
+            Link Kegiatan untuk Pendonor
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <CopyKegiatanLink kegiatanId={id} />
@@ -84,36 +100,40 @@ export default async function KegiatanDetailPage({ params }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Peserta ({partisipasiList.length})</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <UsersIcon className="size-4 text-rose-600" />
+            Peserta ({partisipasiList.length})
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nama</TableHead>
-                <TableHead>Telepon</TableHead>
-                <TableHead>Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {partisipasiList.map((p) => (
-                <TableRow key={p._id}>
-                  <TableCell>{p.donorId?.nama}</TableCell>
-                  <TableCell>{p.donorId?.telepon}</TableCell>
-                  <TableCell>
-                    <StatusBadge status={p.status} />
-                  </TableCell>
-                </TableRow>
-              ))}
-              {partisipasiList.length === 0 && (
+          {partisipasiList.length === 0 ? (
+            <EmptyState
+              icon={UsersIcon}
+              title="Belum ada pendonor yang mendaftar"
+              description="Peserta yang mendaftar untuk kegiatan ini akan muncul di sini."
+            />
+          ) : (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center text-muted-foreground">
-                    Belum ada pendonor yang mendaftar.
-                  </TableCell>
+                  <TableHead>Nama</TableHead>
+                  <TableHead>Telepon</TableHead>
+                  <TableHead>Status</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {partisipasiList.map((p) => (
+                  <TableRow key={p._id}>
+                    <TableCell>{p.donorId?.nama}</TableCell>
+                    <TableCell>{p.donorId?.telepon}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={p.status} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -11,15 +11,11 @@ import { verifyDonorQrPayload } from "@/lib/qr";
 import { adjustStokDarah } from "@/actions/stok.actions";
 import { GOLONGAN_DARAH } from "@/lib/blood-types";
 import { isPendonorProfileComplete, tanggalBolehDonorLagi } from "@/lib/pendonor";
+import { KUESIONER_QUESTIONS, isQuestionApplicable } from "@/lib/kuesioner-questions";
 
 const kuesionerSchema = z.object({
   kegiatanId: z.string().min(1),
-  beratBadan: z.coerce.number().min(1),
-  tekananDarahDiketahui: z.string().optional(),
-  sedangMinumObat: z.string().optional(),
-  detailObat: z.string().optional(),
-  donorTerakhir: z.string().optional(),
-  kondisiSehat: z.string().optional(),
+  kehamilanKe: z.coerce.number().optional(),
   catatanTambahan: z.string().optional(),
 });
 
@@ -37,6 +33,18 @@ export async function daftarKegiatan(prevState, formData) {
     return {
       error: "Lengkapi data diri Anda terlebih dahulu sebelum mendonorkan darah.",
     };
+  }
+
+  const applicableQuestions = KUESIONER_QUESTIONS.filter((q) =>
+    isQuestionApplicable(q, donor.pendonor?.jenisKelamin),
+  );
+  const jawaban = {};
+  for (const q of applicableQuestions) {
+    const value = formData.get(q.id);
+    if (value !== "ya" && value !== "tidak") {
+      return { error: "Jawaban kuesioner tidak lengkap atau tidak valid." };
+    }
+    jawaban[q.id] = value === "ya";
   }
 
   const lastDonasi = await Partisipasi.findOne({
@@ -71,12 +79,8 @@ export async function daftarKegiatan(prevState, formData) {
       kegiatanId: data.kegiatanId,
       status: "menunggu_checkin",
       kuesioner: {
-        beratBadan: data.beratBadan,
-        tekananDarahDiketahui: data.tekananDarahDiketahui || "",
-        sedangMinumObat: data.sedangMinumObat === "on",
-        detailObat: data.detailObat || "",
-        donorTerakhir: data.donorTerakhir || undefined,
-        kondisiSehat: data.kondisiSehat === "on",
+        jawaban,
+        kehamilanKe: jawaban.sedangHamil ? data.kehamilanKe || undefined : undefined,
         catatanTambahan: data.catatanTambahan || "",
         submittedAt: new Date(),
       },

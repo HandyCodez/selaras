@@ -5,6 +5,7 @@ import { Kegiatan } from "@/lib/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { KegiatanForm } from "@/components/forms/kegiatan-form";
 import { updateKegiatan } from "@/actions/kegiatan.actions";
+import { CalendarHeartIcon } from "lucide-react";
 
 export default async function KegiatanEditPage({ params }) {
   const { id } = await params;
@@ -22,7 +23,10 @@ export default async function KegiatanEditPage({ params }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Edit Kegiatan</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <CalendarHeartIcon className="size-5 text-rose-600" />
+          Edit Kegiatan
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <KegiatanForm action={action} kegiatan={JSON.parse(JSON.stringify(kegiatan))} />

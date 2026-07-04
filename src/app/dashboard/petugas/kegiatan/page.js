@@ -12,11 +12,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { StatusBadge } from "@/components/shared/status-badge";
-import { PlusIcon } from "lucide-react";
+import { StatCard } from "@/components/shared/stat-card";
+import { FilterTabs } from "@/components/shared/filter-tabs";
+import { EmptyState } from "@/components/shared/empty-state";
+import { CapacityBar } from "@/components/shared/capacity-bar";
+import { PlusIcon, CalendarHeartIcon, CalendarClockIcon, CheckCircle2Icon } from "lucide-react";
 import { KegiatanStatusActions } from "@/components/petugas/kegiatan-status-actions";
 import { DeleteKegiatanButton } from "@/components/petugas/delete-kegiatan-button";
 import { formatRentangWaktu } from "@/lib/format";
-import { cn } from "@/lib/utils";
 
 const STATUS_FILTERS = [
   { value: "", label: "Semua" },
@@ -33,9 +36,16 @@ export default async function PetugasKegiatanPage({ searchParams }) {
   const filter = { cabangId: session.cabangId };
   if (status) filter.status = status;
 
-  const kegiatanList = await Kegiatan.find(filter)
-    .sort({ tanggalMulai: -1 })
-    .lean();
+  const [kegiatanList, statusCounts] = await Promise.all([
+    Kegiatan.find(filter).sort({ tanggalMulai: -1 }).lean(),
+    Kegiatan.aggregate([
+      { $match: { cabangId: session.cabangId } },
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+    ]),
+  ]);
+  const countByStatus = Object.fromEntries(
+    statusCounts.map((s) => [s._id, s.count]),
+  );
 
   const terisiAgg = await Partisipasi.aggregate([
     { $match: { kegiatanId: { $in: kegiatanList.map((k) => k._id) } } },
@@ -54,78 +64,91 @@ export default async function PetugasKegiatanPage({ searchParams }) {
           Buat Kegiatan
         </Button>
       </div>
-      <div className="flex flex-wrap gap-2">
-        {STATUS_FILTERS.map((f) => (
-          <Link
-            key={f.value}
-            href={
-              f.value
-                ? `/dashboard/petugas/kegiatan?status=${f.value}`
-                : "/dashboard/petugas/kegiatan"
-            }
-            className={cn(
-              "rounded-md border px-3 py-1.5 text-sm",
-              (status || "") === f.value
-                ? "border-primary bg-primary text-primary-foreground"
-                : "text-muted-foreground",
-            )}
-          >
-            {f.label}
-          </Link>
-        ))}
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard
+          icon={CalendarHeartIcon}
+          color="rose"
+          label="Kegiatan Aktif"
+          value={countByStatus.aktif || 0}
+        />
+        <StatCard
+          icon={CalendarClockIcon}
+          color="amber"
+          label="Draft"
+          value={countByStatus.draft || 0}
+        />
+        <StatCard
+          icon={CheckCircle2Icon}
+          color="emerald"
+          label="Selesai"
+          value={countByStatus.selesai || 0}
+        />
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Judul</TableHead>
-            <TableHead>Lokasi</TableHead>
-            <TableHead>Waktu</TableHead>
-            <TableHead>Terisi</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Untuk</TableHead>
-            <TableHead />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {kegiatanList.map((k) => (
-            <TableRow key={k._id}>
-              <TableCell className="font-medium">{k.judul}</TableCell>
-              <TableCell>{k.lokasi}</TableCell>
-              <TableCell>{formatRentangWaktu(k.tanggalMulai, k.tanggalSelesai)}</TableCell>
-              <TableCell>
-                {terisiMap[k._id.toString()] || 0}/{k.kuota}
-              </TableCell>
-              <TableCell>
-                <StatusBadge status={k.status} />
-              </TableCell>
-              <TableCell>
-                <StatusBadge status={k.tipe} />
-              </TableCell>
-              <TableCell className="flex justify-end gap-2">
-                <Button
-                  render={<Link href={`/dashboard/petugas/kegiatan/${k._id}`} />}
-                  variant="ghost"
-                  size="sm"
-                >
-                  Detail
-                </Button>
-                <KegiatanStatusActions kegiatanId={k._id.toString()} status={k.status} />
-                <DeleteKegiatanButton
-                  kegiatanId={k._id.toString()}
-                  kegiatanJudul={k.judul}
-                />
-              </TableCell>
-            </TableRow>
-          ))}
-          {kegiatanList.length === 0 && (
+
+      <FilterTabs
+        options={STATUS_FILTERS}
+        activeValue={status}
+        baseHref="/dashboard/petugas/kegiatan"
+      />
+
+      {kegiatanList.length === 0 ? (
+        <EmptyState
+          icon={CalendarHeartIcon}
+          title="Belum ada kegiatan"
+          description="Kegiatan donor darah yang kamu buat akan muncul di sini."
+        />
+      ) : (
+        <Table>
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={7} className="text-center text-muted-foreground">
-                Belum ada kegiatan.
-              </TableCell>
+              <TableHead>Judul</TableHead>
+              <TableHead>Lokasi</TableHead>
+              <TableHead>Waktu</TableHead>
+              <TableHead>Terisi</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Untuk</TableHead>
+              <TableHead />
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {kegiatanList.map((k) => (
+              <TableRow key={k._id}>
+                <TableCell className="font-medium">{k.judul}</TableCell>
+                <TableCell>{k.lokasi}</TableCell>
+                <TableCell>{formatRentangWaktu(k.tanggalMulai, k.tanggalSelesai)}</TableCell>
+                <TableCell>
+                  <CapacityBar
+                    terisi={terisiMap[k._id.toString()] || 0}
+                    kuota={k.kuota}
+                    className="w-28"
+                  />
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={k.status} />
+                </TableCell>
+                <TableCell>
+                  <StatusBadge status={k.tipe} />
+                </TableCell>
+                <TableCell className="flex justify-end gap-2">
+                  <Button
+                    render={<Link href={`/dashboard/petugas/kegiatan/${k._id}`} />}
+                    variant="ghost"
+                    size="sm"
+                  >
+                    Detail
+                  </Button>
+                  <KegiatanStatusActions kegiatanId={k._id.toString()} status={k.status} />
+                  <DeleteKegiatanButton
+                    kegiatanId={k._id.toString()}
+                    kegiatanJudul={k.judul}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
     </div>
   );
 }

@@ -1,18 +1,13 @@
 import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { getStokByCabang } from "@/actions/stok.actions";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatCard } from "@/components/shared/stat-card";
 import { StokKoreksiForm } from "@/components/petugas/stok-koreksi-form";
 import { Button } from "@/components/ui/button";
-import { HistoryIcon } from "lucide-react";
+import { HistoryIcon, DropletIcon, PencilLineIcon } from "lucide-react";
+
+const STOK_MENIPIS_AMBANG = 10;
 
 export default async function PetugasStokPage() {
   const session = await requireRole("petugas");
@@ -27,26 +22,25 @@ export default async function PetugasStokPage() {
           Riwayat
         </Button>
       </div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Golongan Darah</TableHead>
-            <TableHead>Jumlah Kantong</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {stok.map((s) => (
-            <TableRow key={s.golonganDarah}>
-              <TableCell className="font-medium">{s.golonganDarah}</TableCell>
-              <TableCell>{s.jumlahKantong}</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {stok.map((s) => (
+          <StatCard
+            key={s.golonganDarah}
+            icon={DropletIcon}
+            color={s.jumlahKantong < STOK_MENIPIS_AMBANG ? "amber" : "rose"}
+            label={s.golonganDarah}
+            value={s.jumlahKantong}
+          />
+        ))}
+      </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Koreksi Manual</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <PencilLineIcon className="size-4 text-rose-600" />
+            Koreksi Manual
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <StokKoreksiForm />
