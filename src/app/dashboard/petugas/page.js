@@ -139,7 +139,7 @@ export default async function PetugasHomePage() {
                   <div className="min-w-0 space-y-0.5">
                     <p className="truncate font-medium">{p.rumahSakitId?.nama}</p>
                     <p className="text-xs text-muted-foreground">
-                      {p.items.length} golongan darah
+                      {p.items.length} item
                     </p>
                   </div>
                   {p.urgensi === "mendesak" ? (

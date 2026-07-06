@@ -14,7 +14,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CircleAlertIcon } from "lucide-react";
+import { CircleAlertIcon, ShieldCheckIcon, ShieldAlertIcon } from "lucide-react";
 
 export function WawancaraPanel({ kegiatanList }) {
   const [state, formAction, isPending] = useActionState(
@@ -35,6 +35,7 @@ export function WawancaraPanel({ kegiatanList }) {
   }
 
   if (state?.success && state.partisipasi && !done) {
+    const k = state.partisipasi.kuesioner;
     return (
       <div className="space-y-4">
         <Card>
@@ -45,6 +46,36 @@ export function WawancaraPanel({ kegiatanList }) {
             </p>
           </CardContent>
         </Card>
+        {typeof k?.lolosOtomatis === "boolean" && (
+          <Card
+            className={
+              k.lolosOtomatis
+                ? "border-emerald-200 dark:border-emerald-900"
+                : "border-amber-200 dark:border-amber-900"
+            }
+          >
+            <CardContent className="space-y-2 pt-6">
+              <div className="flex items-center gap-2">
+                {k.lolosOtomatis ? (
+                  <ShieldCheckIcon className="size-4 shrink-0 text-emerald-600" />
+                ) : (
+                  <ShieldAlertIcon className="size-4 shrink-0 text-amber-600" />
+                )}
+                <p className="text-sm font-medium">
+                  Kuesioner:{" "}
+                  {k.lolosOtomatis ? "Lolos skrining awal" : "Ada faktor risiko"}
+                </p>
+              </div>
+              {!k.lolosOtomatis && k.bermasalah?.length > 0 && (
+                <ul className="ml-6 list-disc space-y-0.5 text-xs text-muted-foreground">
+                  {k.bermasalah.map((text) => (
+                    <li key={text}>{text}</li>
+                  ))}
+                </ul>
+              )}
+            </CardContent>
+          </Card>
+        )}
         <WawancaraForm partisipasi={state.partisipasi} onDone={setDone} />
       </div>
     );

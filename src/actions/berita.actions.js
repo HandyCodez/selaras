@@ -1,26 +1,12 @@
 "use server";
 
 import { z } from "zod";
-import fs from "fs/promises";
-import path from "path";
 import crypto from "crypto";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { connectDB } from "@/lib/db";
 import { Berita } from "@/lib/models";
 import { requireRole } from "@/lib/auth";
-
-const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "berita");
-
-async function saveCoverImage(file) {
-  if (!file || typeof file === "string" || file.size === 0) return null;
-  await fs.mkdir(UPLOAD_DIR, { recursive: true });
-  const ext = path.extname(file.name) || ".jpg";
-  const filename = `${crypto.randomUUID()}${ext}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
-  await fs.writeFile(path.join(UPLOAD_DIR, filename), buffer);
-  return `/uploads/berita/${filename}`;
-}
 
 function slugify(text) {
   return (
@@ -37,6 +23,7 @@ function slugify(text) {
 const beritaSchema = z.object({
   judul: z.string().min(1),
   konten: z.string().min(1),
+  coverImage: z.string().url().optional().or(z.literal("")),
   status: z.enum(["draft", "published"]),
 });
 
@@ -45,20 +32,19 @@ export async function createBerita(prevState, formData) {
   const parsed = beritaSchema.safeParse({
     judul: formData.get("judul"),
     konten: formData.get("konten"),
+    coverImage: formData.get("coverImage"),
     status: formData.get("status"),
   });
   if (!parsed.success) {
     return { error: "Data berita tidak valid." };
   }
 
-  const coverImage = await saveCoverImage(formData.get("coverImage"));
-
   await connectDB();
   await Berita.create({
     judul: parsed.data.judul,
     slug: slugify(parsed.data.judul),
     konten: parsed.data.konten,
-    coverImage: coverImage || "",
+    coverImage: parsed.data.coverImage || "",
     authorId: session.userId,
     status: parsed.data.status,
     publishedAt: parsed.data.status === "published" ? new Date() : undefined,
@@ -73,6 +59,7 @@ export async function updateBerita(beritaId, prevState, formData) {
   const parsed = beritaSchema.safeParse({
     judul: formData.get("judul"),
     konten: formData.get("konten"),
+    coverImage: formData.get("coverImage"),
     status: formData.get("status"),
   });
   if (!parsed.success) {
@@ -85,11 +72,9 @@ export async function updateBerita(beritaId, prevState, formData) {
     return { error: "Berita tidak ditemukan." };
   }
 
-  const coverImage = await saveCoverImage(formData.get("coverImage"));
-
   berita.judul = parsed.data.judul;
   berita.konten = parsed.data.konten;
-  if (coverImage) berita.coverImage = coverImage;
+  berita.coverImage = parsed.data.coverImage || "";
   if (parsed.data.status === "published" && berita.status !== "published") {
     berita.publishedAt = new Date();
   }

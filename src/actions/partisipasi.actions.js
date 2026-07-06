@@ -11,7 +11,11 @@ import { verifyDonorQrPayload } from "@/lib/qr";
 import { adjustStokDarah } from "@/actions/stok.actions";
 import { GOLONGAN_DARAH } from "@/lib/blood-types";
 import { isPendonorProfileComplete, tanggalBolehDonorLagi } from "@/lib/pendonor";
-import { KUESIONER_QUESTIONS, isQuestionApplicable } from "@/lib/kuesioner-questions";
+import {
+  KUESIONER_QUESTIONS,
+  isQuestionApplicable,
+  evaluateKuesioner,
+} from "@/lib/kuesioner-questions";
 
 const kuesionerSchema = z.object({
   kegiatanId: z.string().min(1),
@@ -46,6 +50,10 @@ export async function daftarKegiatan(prevState, formData) {
     }
     jawaban[q.id] = value === "ya";
   }
+  const { lolos: lolosOtomatis, bermasalah } = evaluateKuesioner(
+    jawaban,
+    donor.pendonor?.jenisKelamin,
+  );
 
   const lastDonasi = await Partisipasi.findOne({
     donorId: session.userId,
@@ -83,6 +91,8 @@ export async function daftarKegiatan(prevState, formData) {
         kehamilanKe: jawaban.sedangHamil ? data.kehamilanKe || undefined : undefined,
         catatanTambahan: data.catatanTambahan || "",
         submittedAt: new Date(),
+        lolosOtomatis,
+        bermasalah,
       },
     });
   } catch (err) {
@@ -287,6 +297,9 @@ export async function submitWawancara(partisipasiId, prevState, formData) {
       const result = await adjustStokDarah({
         cabangId: kegiatan.cabangId,
         golonganDarah: data.golonganDarah,
+        // A fresh donation always yields whole blood — PMI lab staff split
+        // it into other components later via manual stock correction.
+        komponenDarah: "WB",
         delta: 1,
         alasan: "donasi_selesai",
         refId: partisipasi._id,

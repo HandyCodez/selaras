@@ -5,7 +5,7 @@ import { Partisipasi } from "@/lib/models";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DetailField } from "@/components/shared/detail-field";
-import { NotebookPenIcon } from "lucide-react";
+import { NotebookPenIcon, ShieldCheckIcon, ShieldAlertIcon } from "lucide-react";
 import { KUESIONER_SECTIONS, isQuestionApplicable } from "@/lib/kuesioner-questions";
 
 export default async function KuesionerViewPage({ params }) {
@@ -32,6 +32,33 @@ export default async function KuesionerViewPage({ params }) {
         <CardTitle>Kuesioner - {partisipasi.kegiatanId?.judul}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {hasJawaban && typeof k.lolosOtomatis === "boolean" && (
+          <div
+            className={
+              k.lolosOtomatis
+                ? "flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 dark:border-emerald-900 dark:bg-emerald-950"
+                : "flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950"
+            }
+          >
+            {k.lolosOtomatis ? (
+              <ShieldCheckIcon className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+            ) : (
+              <ShieldAlertIcon className="mt-0.5 size-4 shrink-0 text-amber-600" />
+            )}
+            <div className="text-sm">
+              <p className="font-medium">
+                {k.lolosOtomatis
+                  ? "Lolos skrining awal"
+                  : "Perlu perhatian petugas saat wawancara"}
+              </p>
+              <p className="text-muted-foreground">
+                {k.lolosOtomatis
+                  ? "Jawaban kuesioner Anda tidak menunjukkan faktor risiko. Kelayakan akhir tetap ditentukan petugas saat wawancara medis."
+                  : "Beberapa jawaban Anda menunjukkan kemungkinan faktor risiko. Petugas akan meninjau lebih lanjut saat wawancara medis."}
+              </p>
+            </div>
+          </div>
+        )}
         {!hasJawaban ? (
           <p className="text-sm text-muted-foreground">
             Data kuesioner untuk pendaftaran ini menggunakan format lama dan

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { requireRole } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { PermintaanDarah } from "@/lib/models";
-import { getStokByCabang } from "@/actions/stok.actions";
+import { getStokMapByCabang } from "@/actions/stok.actions";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { DetailField } from "@/components/shared/detail-field";
 import { PageHeaderIcon } from "@/components/shared/page-header-icon";
@@ -24,8 +24,7 @@ export default async function PetugasPermintaanDetailPage({ params }) {
     .lean();
   if (!permintaan) notFound();
 
-  const stok = await getStokByCabang(session.cabangId);
-  const stokMap = Object.fromEntries(stok.map((s) => [s.golonganDarah, s.jumlahKantong]));
+  const stokMap = await getStokMapByCabang(session.cabangId);
 
   return (
     <div className="max-w-2xl space-y-6">

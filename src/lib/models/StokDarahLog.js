@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { GOLONGAN_DARAH } from "../blood-types.js";
+import { KOMPONEN_DARAH } from "../blood-components.js";
 
 const StokDarahLogSchema = new mongoose.Schema(
   {
@@ -10,6 +11,7 @@ const StokDarahLogSchema = new mongoose.Schema(
       index: true,
     },
     golonganDarah: { type: String, enum: GOLONGAN_DARAH, required: true },
+    komponenDarah: { type: String, enum: KOMPONEN_DARAH, required: true },
     delta: { type: Number, required: true },
     alasan: {
       type: String,

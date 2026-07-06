@@ -38,13 +38,14 @@ export function BeritaForm({ action, berita }) {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="coverImage">Gambar Sampul</Label>
-        <Input id="coverImage" name="coverImage" type="file" accept="image/*" />
-        {berita?.coverImage && (
-          <p className="text-xs text-muted-foreground">
-            Gambar saat ini akan tetap dipakai jika tidak diganti.
-          </p>
-        )}
+        <Label htmlFor="coverImage">URL Gambar Sampul</Label>
+        <Input
+          id="coverImage"
+          name="coverImage"
+          type="url"
+          placeholder="https://contoh.com/gambar.jpg"
+          defaultValue={berita?.coverImage}
+        />
       </div>
       <div className="space-y-2">
         <Label htmlFor="status">Status</Label>

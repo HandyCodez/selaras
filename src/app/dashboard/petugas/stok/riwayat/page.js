@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeaderIcon } from "@/components/shared/page-header-icon";
 import { HistoryIcon } from "lucide-react";
+import { KOMPONEN_DARAH_LABELS } from "@/lib/blood-components";
 
 const ALASAN_LABELS = {
   donasi_selesai: "Donor Selesai",
@@ -45,6 +46,7 @@ export default async function RiwayatStokPage() {
             <TableRow>
               <TableHead>Tanggal</TableHead>
               <TableHead>Golongan</TableHead>
+              <TableHead>Komponen</TableHead>
               <TableHead>Perubahan</TableHead>
               <TableHead>Alasan</TableHead>
               <TableHead>Oleh</TableHead>
@@ -57,6 +59,7 @@ export default async function RiwayatStokPage() {
                   {new Date(log.createdAt).toLocaleString("id-ID")}
                 </TableCell>
                 <TableCell className="font-medium">{log.golonganDarah}</TableCell>
+                <TableCell>{KOMPONEN_DARAH_LABELS[log.komponenDarah] || log.komponenDarah}</TableCell>
                 <TableCell>
                   <Badge variant={log.delta > 0 ? "default" : "destructive"}>
                     {log.delta > 0 ? `+${log.delta}` : log.delta}

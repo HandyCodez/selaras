@@ -15,6 +15,7 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { PageHeaderIcon } from "@/components/shared/page-header-icon";
 import { CancelPermintaanButton } from "@/components/rumah-sakit/cancel-permintaan-button";
 import { Building2Icon, DropletIcon, NotebookPenIcon } from "lucide-react";
+import { KOMPONEN_DARAH_LABELS } from "@/lib/blood-components";
 
 export default async function RumahSakitPermintaanDetailPage({ params }) {
   const { id } = await params;
@@ -55,14 +56,16 @@ export default async function RumahSakitPermintaanDetailPage({ params }) {
             <TableHeader>
               <TableRow>
                 <TableHead>Golongan Darah</TableHead>
+                <TableHead>Komponen</TableHead>
                 <TableHead>Diminta</TableHead>
                 <TableHead>Dipenuhi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {permintaan.items.map((item) => (
-                <TableRow key={item.golonganDarah}>
+                <TableRow key={`${item.golonganDarah}|${item.komponenDarah}`}>
                   <TableCell>{item.golonganDarah}</TableCell>
+                  <TableCell>{KOMPONEN_DARAH_LABELS[item.komponenDarah]}</TableCell>
                   <TableCell>{item.jumlahDiminta}</TableCell>
                   <TableCell>{item.jumlahDipenuhi}</TableCell>
                 </TableRow>

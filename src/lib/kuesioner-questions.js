@@ -6,7 +6,7 @@ export const KUESIONER_SECTIONS = [
   {
     label: "Hari ini",
     questions: [
-      { id: "sehatHariIni", text: "Merasa sehat pada hari ini?" },
+      { id: "sehatHariIni", text: "Merasa sehat pada hari ini?", safeAnswer: "ya" },
       { id: "minumAntibiotik", text: "Sedang minum antibiotik?" },
       { id: "minumObatInfeksi", text: "Sedang minum obat lain untuk infeksi?" },
     ],
@@ -171,4 +171,22 @@ export const KUESIONER_QUESTIONS = KUESIONER_SECTIONS.flatMap((s) => s.questions
 
 export function isQuestionApplicable(question, jenisKelamin) {
   return !question.genderOnly || question.genderOnly === jenisKelamin;
+}
+
+// Every question defaults to "tidak" being the safe answer (e.g. "Sedang
+// minum antibiotik?") except a few explicitly marked otherwise (e.g.
+// "Merasa sehat pada hari ini?", where "ya" is the safe answer).
+export function evaluateKuesioner(jawaban, jenisKelamin) {
+  const applicable = KUESIONER_QUESTIONS.filter((q) =>
+    isQuestionApplicable(q, jenisKelamin),
+  );
+  const bermasalah = applicable.filter((q) => {
+    const jawabYa = Boolean(jawaban[q.id]);
+    const safeAnswerIsYa = q.safeAnswer === "ya";
+    return jawabYa !== safeAnswerIsYa;
+  });
+  return {
+    lolos: bermasalah.length === 0,
+    bermasalah: bermasalah.map((q) => q.text),
+  };
 }

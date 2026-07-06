@@ -10,6 +10,7 @@ import { requireRole } from "@/lib/auth";
 import { logout } from "@/actions/auth.actions";
 import { adjustStokDarah } from "@/actions/stok.actions";
 import { GOLONGAN_DARAH } from "@/lib/blood-types";
+import { KOMPONEN_DARAH, fulfillFieldName } from "@/lib/blood-components";
 
 const createSchema = z.object({
   cabangId: z.string().min(1),
@@ -17,22 +18,38 @@ const createSchema = z.object({
   catatan: z.string().optional(),
 });
 
+const permintaanItemSchema = z.object({
+  golonganDarah: z.enum(GOLONGAN_DARAH),
+  komponenDarah: z.enum(KOMPONEN_DARAH),
+  jumlah: z.coerce.number().int().min(1),
+});
+
 export async function createPermintaan(prevState, formData) {
   const session = await requireRole("rumah_sakit");
   const raw = Object.fromEntries(formData.entries());
   const parsed = createSchema.safeParse(raw);
-  if (!parsed.success) {
+
+  let itemsRaw;
+  try {
+    itemsRaw = JSON.parse(raw.itemsJson || "[]");
+  } catch {
     return { error: "Data permintaan tidak valid." };
   }
-
-  const items = GOLONGAN_DARAH.map((gol) => ({
-    golonganDarah: gol,
-    jumlahDiminta: Number(raw[`jumlah_${gol}`] || 0),
-  })).filter((item) => item.jumlahDiminta > 0);
-
-  if (items.length === 0) {
-    return { error: "Isi minimal satu jumlah kantong darah yang dibutuhkan." };
+  const itemsParsed = z.array(permintaanItemSchema).safeParse(itemsRaw);
+  if (!parsed.success || !itemsParsed.success || itemsParsed.data.length === 0) {
+    return { error: "Isi minimal satu kantong darah yang dibutuhkan." };
   }
+
+  // Merge duplicate golongan+komponen rows the donor may have entered twice.
+  const merged = new Map();
+  for (const item of itemsParsed.data) {
+    const key = `${item.golonganDarah}|${item.komponenDarah}`;
+    merged.set(key, (merged.get(key) || 0) + item.jumlah);
+  }
+  const items = [...merged.entries()].map(([key, jumlah]) => {
+    const [golonganDarah, komponenDarah] = key.split("|");
+    return { golonganDarah, komponenDarah, jumlahDiminta: jumlah };
+  });
 
   await connectDB();
   const user = await User.findById(session.userId).lean();
@@ -126,7 +143,9 @@ export async function konfirmasiPermintaan(permintaanId, prevState, formData) {
     await mongoSession.withTransaction(async () => {
       for (const item of permintaan.items) {
         const requestedFulfill = Math.min(
-          Number(formData.get(`fulfill_${item.golonganDarah}`) || 0),
+          Number(
+            formData.get(fulfillFieldName(item.golonganDarah, item.komponenDarah)) || 0,
+          ),
           item.jumlahDiminta,
         );
         if (requestedFulfill <= 0) {
@@ -137,6 +156,7 @@ export async function konfirmasiPermintaan(permintaanId, prevState, formData) {
         const result = await adjustStokDarah({
           cabangId: permintaan.cabangId,
           golonganDarah: item.golonganDarah,
+          komponenDarah: item.komponenDarah,
           delta: -requestedFulfill,
           alasan: "permintaan_dipenuhi",
           refId: permintaan._id,

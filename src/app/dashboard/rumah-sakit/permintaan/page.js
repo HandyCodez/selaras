@@ -130,7 +130,7 @@ export default async function RumahSakitPermintaanPage({ searchParams }) {
                 }
               >
                 <TableCell>{p.cabangId?.nama}</TableCell>
-                <TableCell>{p.items.length} golongan darah</TableCell>
+                <TableCell>{p.items.length} item</TableCell>
                 <TableCell>
                   {p.urgensi === "mendesak" ? (
                     <Badge variant="destructive">Mendesak</Badge>

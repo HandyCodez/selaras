@@ -1,9 +1,11 @@
 import mongoose from "mongoose";
 import { GOLONGAN_DARAH } from "../blood-types.js";
+import { KOMPONEN_DARAH } from "../blood-components.js";
 
 const PermintaanItemSchema = new mongoose.Schema(
   {
     golonganDarah: { type: String, enum: GOLONGAN_DARAH, required: true },
+    komponenDarah: { type: String, enum: KOMPONEN_DARAH, required: true },
     jumlahDiminta: { type: Number, required: true, min: 1 },
     jumlahDipenuhi: { type: Number, default: 0, min: 0 },
   },

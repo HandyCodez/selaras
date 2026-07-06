@@ -13,16 +13,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { FilterTabs } from "@/components/shared/filter-tabs";
 import { DropletIcon } from "lucide-react";
+import { KOMPONEN_DARAH, KOMPONEN_DARAH_SHORT_LABELS } from "@/lib/blood-components";
 
 export default async function PendonorStokPage({ searchParams }) {
-  const { cabangId } = await searchParams;
+  const { cabangId, komponen } = await searchParams;
   await requireRole("pendonor");
   await connectDB();
 
   const cabangList = await PmiCabang.find({ isActive: true }).sort({ nama: 1 }).lean();
   const activeCabangId = cabangId || cabangList[0]?._id.toString();
+  const activeKomponen = KOMPONEN_DARAH.includes(komponen) ? komponen : KOMPONEN_DARAH[0];
 
-  const stok = activeCabangId ? await getStokByCabang(activeCabangId) : [];
+  const stok = activeCabangId ? await getStokByCabang(activeCabangId, activeKomponen) : [];
 
   return (
     <div className="max-w-xl space-y-6">
@@ -37,6 +39,14 @@ export default async function PendonorStokPage({ searchParams }) {
         activeValue={activeCabangId}
         baseHref="/dashboard/pendonor/stok"
         paramName="cabangId"
+        extraParams={{ komponen: activeKomponen }}
+      />
+      <FilterTabs
+        options={KOMPONEN_DARAH.map((k) => ({ value: k, label: KOMPONEN_DARAH_SHORT_LABELS[k] }))}
+        activeValue={activeKomponen}
+        baseHref="/dashboard/pendonor/stok"
+        paramName="komponen"
+        extraParams={{ cabangId: activeCabangId }}
       />
       <Table>
         <TableHeader>

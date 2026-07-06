@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/table";
 import { SubmitButton } from "@/components/forms/submit-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { KOMPONEN_DARAH_LABELS, fulfillFieldName } from "@/lib/blood-components";
 
 export function PermintaanConfirmPanel({ permintaan, stokMap }) {
   const confirmAction = konfirmasiPermintaan.bind(null, permintaan._id);
@@ -32,32 +33,35 @@ export function PermintaanConfirmPanel({ permintaan, stokMap }) {
           <TableHeader>
             <TableRow>
               <TableHead>Golongan Darah</TableHead>
+              <TableHead>Komponen</TableHead>
               <TableHead>Diminta</TableHead>
               <TableHead>Stok Tersedia</TableHead>
               <TableHead>Penuhi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {permintaan.items.map((item) => (
-              <TableRow key={item.golonganDarah}>
-                <TableCell>{item.golonganDarah}</TableCell>
-                <TableCell>{item.jumlahDiminta}</TableCell>
-                <TableCell>{stokMap[item.golonganDarah] || 0}</TableCell>
-                <TableCell>
-                  <Input
-                    type="number"
-                    name={`fulfill_${item.golonganDarah}`}
-                    min="0"
-                    max={item.jumlahDiminta}
-                    defaultValue={Math.min(
-                      item.jumlahDiminta,
-                      stokMap[item.golonganDarah] || 0,
-                    )}
-                    className="w-24"
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
+            {permintaan.items.map((item) => {
+              const tersedia =
+                stokMap[`${item.golonganDarah}|${item.komponenDarah}`] || 0;
+              return (
+                <TableRow key={`${item.golonganDarah}|${item.komponenDarah}`}>
+                  <TableCell>{item.golonganDarah}</TableCell>
+                  <TableCell>{KOMPONEN_DARAH_LABELS[item.komponenDarah]}</TableCell>
+                  <TableCell>{item.jumlahDiminta}</TableCell>
+                  <TableCell>{tersedia}</TableCell>
+                  <TableCell>
+                    <Input
+                      type="number"
+                      name={fulfillFieldName(item.golonganDarah, item.komponenDarah)}
+                      min="0"
+                      max={item.jumlahDiminta}
+                      defaultValue={Math.min(item.jumlahDiminta, tersedia)}
+                      className="w-24"
+                    />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
         <div className="space-y-2">

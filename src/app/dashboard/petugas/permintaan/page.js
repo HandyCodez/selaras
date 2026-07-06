@@ -130,7 +130,7 @@ export default async function PetugasPermintaanPage({ searchParams }) {
                 }
               >
                 <TableCell>{p.rumahSakitId?.nama}</TableCell>
-                <TableCell>{p.items.length} golongan darah</TableCell>
+                <TableCell>{p.items.length} item</TableCell>
                 <TableCell>
                   {p.urgensi === "mendesak" ? (
                     <Badge variant="destructive">Mendesak</Badge>

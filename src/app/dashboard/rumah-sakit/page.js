@@ -130,7 +130,7 @@ export default async function RumahSakitHomePage() {
                     {p.cabangId?.nama}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {p.items.length} golongan darah
+                    {p.items.length} item
                   </p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">

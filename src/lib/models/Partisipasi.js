@@ -8,6 +8,11 @@ const KuesionerSchema = new mongoose.Schema(
     kehamilanKe: { type: Number },
     catatanTambahan: { type: String, default: "" },
     submittedAt: { type: Date, default: Date.now },
+    // Auto-scored right at submission (see evaluateKuesioner) — a preliminary
+    // screening flag for petugas, not a replacement for the wawancara's
+    // medical judgement call.
+    lolosOtomatis: { type: Boolean },
+    bermasalah: { type: [String], default: [] },
   },
   { _id: false },
 );
