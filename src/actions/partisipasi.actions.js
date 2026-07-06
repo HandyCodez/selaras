@@ -81,8 +81,9 @@ export async function daftarKegiatan(prevState, formData) {
     return { error: "Kuota kegiatan ini sudah penuh." };
   }
 
+  let partisipasi;
   try {
-    await Partisipasi.create({
+    partisipasi = await Partisipasi.create({
       donorId: session.userId,
       kegiatanId: data.kegiatanId,
       status: "menunggu_checkin",
@@ -103,7 +104,7 @@ export async function daftarKegiatan(prevState, formData) {
   }
 
   revalidatePath("/dashboard/pendonor/kegiatan");
-  redirect(`/dashboard/pendonor/kegiatan/${data.kegiatanId}`);
+  redirect(`/dashboard/pendonor/kuesioner/${partisipasi._id}`);
 }
 
 // Hard-deletes the record rather than marking a "cancelled" status — a

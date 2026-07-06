@@ -38,6 +38,9 @@ export default function Home() {
         <Link href="/komunitas" className="underline text-muted-foreground">
           Komunitas donor darah
         </Link>
+        <Link href="/edukasi" className="underline text-muted-foreground">
+          Edukasi donor darah
+        </Link>
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import {
   ClipboardListIcon,
   ClipboardCheckIcon,
   HeartHandshakeIcon,
+  GraduationCapIcon,
   LayoutDashboardIcon,
   Building2Icon,
   UsersIcon,
@@ -19,6 +20,7 @@ export const NAV_ITEMS = {
   pendonor: [
     { href: "/dashboard/pendonor", label: "Beranda", icon: LayoutDashboardIcon },
     { href: "/syarat-donor", label: "Syarat Donor", icon: ClipboardCheckIcon },
+    { href: "/edukasi", label: "Edukasi", icon: GraduationCapIcon },
     { href: "/berita", label: "Berita", icon: NewspaperIcon },
     { href: "/komunitas", label: "Komunitas", icon: HeartHandshakeIcon },
     { href: "/dashboard/pendonor/kegiatan", label: "Kegiatan Donor", icon: CalendarHeartIcon },
