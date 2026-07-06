@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MenuIcon, UserRoundIcon, LogOutIcon } from "lucide-react";
 import { ROLE_LABELS, ACCOUNT_HREF } from "@/components/layout/role-nav-items";
+import { NotificationBell } from "@/components/layout/notification-bell";
 
 export function DashboardTopbar({ nama, role, onMenuClick }) {
   const [, startTransition] = useTransition();
@@ -50,42 +51,45 @@ export function DashboardTopbar({ nama, role, onMenuClick }) {
         />
         <span className="font-semibold">SELARAS+</span>
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
-          <Avatar className="size-8 shrink-0">
-            <AvatarFallback>{initials}</AvatarFallback>
-          </Avatar>
-          <div className="hidden text-left text-sm sm:block">
-            <p className="font-medium leading-none">{nama}</p>
-            <p className="text-muted-foreground">{ROLE_LABELS[role]}</p>
-          </div>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="min-w-48">
-          <DropdownMenuGroup>
-            <DropdownMenuLabel>
-              <p className="font-medium">{nama}</p>
-              <p className="text-xs font-normal text-muted-foreground">
-                {ROLE_LABELS[role]}
-              </p>
-            </DropdownMenuLabel>
-          </DropdownMenuGroup>
-          <DropdownMenuSeparator />
-          {accountHref && (
-            <DropdownMenuLinkItem render={<Link href={accountHref} />}>
-              <UserRoundIcon />
-              Akun Saya
-            </DropdownMenuLinkItem>
-          )}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            variant="destructive"
-            onClick={() => startTransition(() => logout())}
-          >
-            <LogOutIcon />
-            Keluar
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="flex items-center gap-1">
+        <NotificationBell role={role} />
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
+            <Avatar className="size-8 shrink-0">
+              <AvatarFallback>{initials}</AvatarFallback>
+            </Avatar>
+            <div className="hidden text-left text-sm sm:block">
+              <p className="font-medium leading-none">{nama}</p>
+              <p className="text-muted-foreground">{ROLE_LABELS[role]}</p>
+            </div>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-48">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>
+                <p className="font-medium">{nama}</p>
+                <p className="text-xs font-normal text-muted-foreground">
+                  {ROLE_LABELS[role]}
+                </p>
+              </DropdownMenuLabel>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            {accountHref && (
+              <DropdownMenuLinkItem render={<Link href={accountHref} />}>
+                <UserRoundIcon />
+                Akun Saya
+              </DropdownMenuLinkItem>
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => startTransition(() => logout())}
+            >
+              <LogOutIcon />
+              Keluar
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </header>
   );
 }
