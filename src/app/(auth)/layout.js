@@ -15,7 +15,7 @@ export default async function AuthLayout({ children }) {
         <Link href="/" className="flex justify-center">
           <Image
             src="/logo.jpeg"
-            alt="Selaras+"
+            alt="SELARAS+"
             width={374}
             height={331}
             priority

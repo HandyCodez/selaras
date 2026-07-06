@@ -7,14 +7,14 @@ export default function Home() {
     <div className="flex flex-1 flex-col items-center justify-center gap-6 bg-zinc-50 px-6 text-center dark:bg-zinc-950">
       <Image
         src="/logo.jpeg"
-        alt="Selaras+"
+        alt="SELARAS+"
         width={374}
         height={331}
         priority
         className="h-20 w-auto rounded-xl object-contain"
       />
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Selaras+</h1>
+        <h1 className="text-3xl font-bold tracking-tight">SELARAS+</h1>
         <p className="max-w-md text-muted-foreground">
           Aplikasi donor darah yang menghubungkan pendonor, PMI, dan rumah
           sakit untuk mempermudah proses donor darah.

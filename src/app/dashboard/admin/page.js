@@ -16,7 +16,7 @@ export default async function AdminHomePage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold">Halo, {user.nama}</h1>
-        <p className="text-muted-foreground">Administrator Selaras+</p>
+        <p className="text-muted-foreground">Administrator SELARAS+</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         <Card>

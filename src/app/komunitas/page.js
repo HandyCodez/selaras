@@ -92,7 +92,7 @@ export default async function KomunitasPage() {
           </div>
           <p className="text-xs text-muted-foreground">
             Kontak di atas masih berupa contoh dan akan diperbarui dengan
-            tautan resmi komunitas Selaras+.
+            tautan resmi komunitas SELARAS+.
           </p>
         </div>
 

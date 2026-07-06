@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Selaras+ - Donor Darah",
+  title: "SELARAS+ - Donor Darah",
   description: "Aplikasi donor darah PMI",
   icons: {
     icon: "/logo.jpeg",

@@ -43,12 +43,12 @@ export function DashboardTopbar({ nama, role, onMenuClick }) {
         </Button>
         <Image
           src="/logo.jpeg"
-          alt="Selaras+"
+          alt="SELARAS+"
           width={374}
           height={331}
           className="size-8 shrink-0 rounded-full object-cover"
         />
-        <span className="font-semibold">Selaras+</span>
+        <span className="font-semibold">SELARAS+</span>
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">

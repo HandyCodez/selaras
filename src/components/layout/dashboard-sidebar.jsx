@@ -31,12 +31,12 @@ export function DashboardSidebar({ role, nama, open, onNavigate }) {
       <Link href="/" className="mb-4 flex items-center gap-2 px-1 md:hidden">
         <Image
           src="/logo.jpeg"
-          alt="Selaras+"
+          alt="SELARAS+"
           width={374}
           height={331}
           className="size-8 shrink-0 rounded-full object-cover"
         />
-        <span className="font-semibold">Selaras+</span>
+        <span className="font-semibold">SELARAS+</span>
       </Link>
 
       <div className="flex flex-1 flex-col gap-1 overflow-y-auto">
