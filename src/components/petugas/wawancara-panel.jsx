@@ -16,12 +16,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CircleAlertIcon, ShieldCheckIcon, ShieldAlertIcon } from "lucide-react";
 
-export function WawancaraPanel({ kegiatanList }) {
+export function WawancaraPanel({ kegiatanList, defaultKegiatanId }) {
   const [state, formAction, isPending] = useActionState(
     findPartisipasiForWawancara,
     null,
   );
-  const [kegiatanId, setKegiatanId] = useState(kegiatanList[0]?._id || "");
+  const [kegiatanId, setKegiatanId] = useState(defaultKegiatanId || kegiatanList[0]?._id || "");
   const [done, setDone] = useState(null);
 
   function handleScan(qrPayload) {

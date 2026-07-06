@@ -182,6 +182,25 @@ export async function checkinDonor(prevState, formData) {
   );
 
   if (!partisipasi) {
+    // Donor may have registered for a different kegiatan at this same
+    // cabang (easy to pick the wrong one when several are active at once)
+    // — check before concluding they never registered at all.
+    const pendaftaranLain = await Partisipasi.find({
+      donorId,
+      status: "menunggu_checkin",
+    })
+      .populate("kegiatanId", "judul cabangId")
+      .lean();
+    const kegiatanLain = pendaftaranLain.find(
+      (p) => p.kegiatanId?.cabangId?.toString() === session.cabangId,
+    );
+
+    if (kegiatanLain) {
+      return {
+        error: `${donor.nama} terdaftar untuk kegiatan "${kegiatanLain.kegiatanId.judul}", bukan kegiatan yang sedang dipilih. Ganti kegiatan di atas lalu pindai ulang.`,
+      };
+    }
+
     return {
       error: `${donor.nama} belum mendaftar untuk kegiatan ini.`,
     };

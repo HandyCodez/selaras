@@ -14,9 +14,9 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { CircleCheckIcon, CircleAlertIcon } from "lucide-react";
 
-export function CheckinPanel({ kegiatanList }) {
+export function CheckinPanel({ kegiatanList, defaultKegiatanId }) {
   const [state, formAction, isPending] = useActionState(checkinDonor, null);
-  const [kegiatanId, setKegiatanId] = useState(kegiatanList[0]?._id || "");
+  const [kegiatanId, setKegiatanId] = useState(defaultKegiatanId || kegiatanList[0]?._id || "");
 
   function handleScan(qrPayload) {
     if (isPending || !kegiatanId) return;

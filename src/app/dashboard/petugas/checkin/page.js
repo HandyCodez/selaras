@@ -4,6 +4,7 @@ import { Kegiatan } from "@/lib/models";
 import { CheckinPanel } from "@/components/petugas/checkin-panel";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeaderIcon } from "@/components/shared/page-header-icon";
+import { pilihKegiatanDefault } from "@/lib/kegiatan";
 import { QrCodeIcon, CalendarHeartIcon } from "lucide-react";
 
 export default async function CheckinPage() {
@@ -31,7 +32,10 @@ export default async function CheckinPage() {
           description="Buat atau aktifkan kegiatan donor darah terlebih dahulu sebelum bisa melakukan check-in."
         />
       ) : (
-        <CheckinPanel kegiatanList={kegiatanList} />
+        <CheckinPanel
+          kegiatanList={kegiatanList}
+          defaultKegiatanId={pilihKegiatanDefault(kegiatanList)?._id}
+        />
       )}
     </div>
   );

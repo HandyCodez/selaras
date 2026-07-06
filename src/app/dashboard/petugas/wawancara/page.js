@@ -4,6 +4,7 @@ import { Kegiatan } from "@/lib/models";
 import { WawancaraPanel } from "@/components/petugas/wawancara-panel";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeaderIcon } from "@/components/shared/page-header-icon";
+import { pilihKegiatanDefault } from "@/lib/kegiatan";
 import { StethoscopeIcon, CalendarHeartIcon } from "lucide-react";
 
 export default async function WawancaraPage() {
@@ -31,7 +32,10 @@ export default async function WawancaraPage() {
           description="Buat atau aktifkan kegiatan donor darah terlebih dahulu sebelum bisa melakukan wawancara."
         />
       ) : (
-        <WawancaraPanel kegiatanList={kegiatanList} />
+        <WawancaraPanel
+          kegiatanList={kegiatanList}
+          defaultKegiatanId={pilihKegiatanDefault(kegiatanList)?._id}
+        />
       )}
     </div>
   );
