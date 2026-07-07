@@ -14,6 +14,7 @@ import {
   LayoutDashboardIcon,
   Building2Icon,
   UsersIcon,
+  UserRoundSearchIcon,
 } from "lucide-react";
 
 export const NAV_ITEMS = {
@@ -33,6 +34,7 @@ export const NAV_ITEMS = {
     { href: "/dashboard/petugas/kegiatan", label: "Kegiatan Donor", icon: CalendarHeartIcon },
     { href: "/dashboard/petugas/checkin", label: "Check-in Pendonor", icon: QrCodeIcon },
     { href: "/dashboard/petugas/wawancara", label: "Wawancara Medis", icon: StethoscopeIcon },
+    { href: "/dashboard/petugas/pendonor", label: "Data Pendonor", icon: UserRoundSearchIcon },
     { href: "/dashboard/petugas/permintaan", label: "Permintaan Darah", icon: ClipboardListIcon },
     { href: "/dashboard/petugas/stok", label: "Stok Darah", icon: DropletIcon },
     { href: "/dashboard/petugas/berita", label: "Kelola Berita", icon: NewspaperIcon },
