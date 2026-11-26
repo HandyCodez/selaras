@@ -7,6 +7,7 @@ import StokDarah from "./StokDarah.js";
 import StokDarahLog from "./StokDarahLog.js";
 import PermintaanDarah from "./PermintaanDarah.js";
 import Berita from "./Berita.js";
+import KantongDarah from "./KantongDarah.js";
 
 export {
   User,
@@ -18,4 +19,5 @@ export {
   StokDarahLog,
   PermintaanDarah,
   Berita,
+  KantongDarah,
 };

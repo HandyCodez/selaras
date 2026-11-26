@@ -50,11 +50,6 @@ const registerPendonorSchema = z.object({
   password: z.string().min(6),
 });
 
-// Registration is intentionally minimal — just telepon + password. Personal
-// data (nama, tanggal lahir, jenis kelamin, alamat) is filled in later via
-// the "lengkapi profil" flow, required before the donor can join a kegiatan.
-// Golongan darah is never self-reported — only petugas set it, during the
-// medical interview (see submitWawancara in partisipasi.actions.js).
 export async function registerPendonor(prevState, formData) {
   const parsed = registerPendonorSchema.safeParse({
     telepon: formData.get("telepon"),

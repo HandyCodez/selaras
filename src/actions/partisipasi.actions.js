@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { connectDB } from "@/lib/db";
-import { Partisipasi, Kegiatan, User } from "@/lib/models";
+import { Partisipasi, Kegiatan, User, KantongDarah } from "@/lib/models";
 import { requireRole } from "@/lib/auth";
 import { verifyDonorQrPayload } from "@/lib/qr";
 import { adjustStokDarah } from "@/actions/stok.actions";
@@ -314,6 +314,21 @@ export async function submitWawancara(partisipasiId, prevState, formData) {
         );
       }
 
+      const selesaiAt = partisipasi.selesaiAt;
+
+      // Create a traceable blood bag record for this donation — always WB
+      // at this point (lab splits it into other components later via manual
+      // stock correction). createFromDonasi runs inside the same transaction
+      // so a failure rolls back both the partisipasi save and stok update.
+      const [kantong] = await KantongDarah.createFromDonasi({
+        donorId: partisipasi.donorId,
+        partisipasiId: partisipasi._id,
+        cabangId: kegiatan.cabangId,
+        golonganDarah: data.golonganDarah,
+        tanggalDonor: selesaiAt,
+        mongoSession,
+      });
+
       const result = await adjustStokDarah({
         cabangId: kegiatan.cabangId,
         golonganDarah: data.golonganDarah,
@@ -323,6 +338,7 @@ export async function submitWawancara(partisipasiId, prevState, formData) {
         delta: 1,
         alasan: "donasi_selesai",
         refId: partisipasi._id,
+        kantongId: kantong._id,
         actorId: session.userId,
         session: mongoSession,
       });

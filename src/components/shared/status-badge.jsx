@@ -17,6 +17,11 @@ const VARIANTS = {
   published: "default",
   umum: "secondary",
   internal: "outline",
+  // kantong darah
+  tersedia: "default",
+  terpakai: "secondary",
+  kadaluarsa: "destructive",
+  dibuang: "outline",
 };
 
 const LABELS = {
@@ -35,6 +40,11 @@ const LABELS = {
   published: "Diterbitkan",
   umum: "Umum",
   internal: "Internal",
+  // kantong darah
+  tersedia: "Tersedia",
+  terpakai: "Terpakai",
+  kadaluarsa: "Kadaluarsa",
+  dibuang: "Dibuang",
 };
 
 export function StatusBadge({ status }) {

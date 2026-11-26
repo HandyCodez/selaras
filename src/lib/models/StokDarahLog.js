@@ -19,6 +19,12 @@ const StokDarahLogSchema = new mongoose.Schema(
       required: true,
     },
     refId: { type: mongoose.Schema.Types.ObjectId },
+    // Set for logs triggered by a specific blood bag (donasi_selesai).
+    kantongId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "KantongDarah",
+      default: null,
+    },
     actorId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true },

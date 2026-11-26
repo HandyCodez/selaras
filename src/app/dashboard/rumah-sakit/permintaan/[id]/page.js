@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { requireCurrentUser } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { PermintaanDarah } from "@/lib/models";
+import { getKantongByPermintaan } from "@/actions/kantong.actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -14,8 +15,8 @@ import {
 import { StatusBadge } from "@/components/shared/status-badge";
 import { PageHeaderIcon } from "@/components/shared/page-header-icon";
 import { CancelPermintaanButton } from "@/components/rumah-sakit/cancel-permintaan-button";
-import { Building2Icon, DropletIcon, NotebookPenIcon } from "lucide-react";
-import { KOMPONEN_DARAH_LABELS } from "@/lib/blood-components";
+import { Building2Icon, DropletIcon, NotebookPenIcon, PackageIcon } from "lucide-react";
+import { KOMPONEN_DARAH_LABELS, KOMPONEN_DARAH_SHORT_LABELS } from "@/lib/blood-components";
 
 export default async function RumahSakitPermintaanDetailPage({ params }) {
   const { id } = await params;
@@ -34,6 +35,10 @@ export default async function RumahSakitPermintaanDetailPage({ params }) {
     .populate("cabangId", "nama kota")
     .lean();
   if (!permintaan) notFound();
+
+  // Only fetch traceability data once the request has been processed
+  const isProcessed = ["dikonfirmasi", "sebagian"].includes(permintaan.status);
+  const kantongList = isProcessed ? await getKantongByPermintaan(id) : [];
 
   return (
     <div className="max-w-xl space-y-6">
@@ -74,6 +79,47 @@ export default async function RumahSakitPermintaanDetailPage({ params }) {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Traceability: show donor info once the request is fulfilled */}
+      {kantongList.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <PackageIcon className="size-4 text-rose-600" />
+              Kantong Darah Diterima
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>No. Kantong</TableHead>
+                    <TableHead>Nama Pendonor</TableHead>
+                    <TableHead>Gol.</TableHead>
+                    <TableHead>Komponen</TableHead>
+                    <TableHead>Tgl. Donor</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {kantongList.map((k) => (
+                    <TableRow key={k._id}>
+                      <TableCell className="font-mono text-xs">{k.nomorKantong}</TableCell>
+                      {/* RS only sees the donor's name — no NIK or phone */}
+                      <TableCell className="text-sm">{k.donorId?.nama ?? "—"}</TableCell>
+                      <TableCell className="font-semibold">{k.golonganDarah}</TableCell>
+                      <TableCell>{KOMPONEN_DARAH_SHORT_LABELS[k.komponenDarah] ?? k.komponenDarah}</TableCell>
+                      <TableCell className="text-sm">
+                        {new Date(k.tanggalDonor).toLocaleDateString("id-ID")}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {permintaan.catatan && (
         <Card>

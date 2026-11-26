@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireRole } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import { Partisipasi } from "@/lib/models";
+import { getKantongByDonor } from "@/actions/kantong.actions";
 import {
   Table,
   TableBody,
@@ -11,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { CancelPartisipasiButton } from "@/components/pendonor/cancel-partisipasi-button";
 import { FilterTabs } from "@/components/shared/filter-tabs";
@@ -33,10 +35,18 @@ export default async function RiwayatDonorPage({ searchParams }) {
   const filter = { donorId: session.userId };
   if (status) filter.status = status;
 
-  const partisipasiList = await Partisipasi.find(filter)
-    .populate("kegiatanId", "judul lokasi tanggalMulai")
-    .sort({ createdAt: -1 })
-    .lean();
+  const [partisipasiList, kantongList] = await Promise.all([
+    Partisipasi.find(filter)
+      .populate("kegiatanId", "judul lokasi tanggalMulai")
+      .sort({ createdAt: -1 })
+      .lean(),
+    getKantongByDonor(session.userId),
+  ]);
+
+  // Index kantong by partisipasiId string for O(1) lookup
+  const kantongByPartisipasi = Object.fromEntries(
+    kantongList.map((k) => [k.partisipasiId?.toString(), k]),
+  );
 
   return (
     <div className="space-y-6">
@@ -64,42 +74,55 @@ export default async function RiwayatDonorPage({ searchParams }) {
               <TableHead>Kegiatan</TableHead>
               <TableHead>Tanggal</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>No. Kantong</TableHead>
               <TableHead />
             </TableRow>
           </TableHeader>
           <TableBody>
-            {partisipasiList.map((p) => (
-              <TableRow key={p._id}>
-                <TableCell className="font-medium">{p.kegiatanId?.judul}</TableCell>
-                <TableCell>
-                  {new Date(p.kegiatanId?.tanggalMulai).toLocaleDateString("id-ID")}
-                </TableCell>
-                <TableCell>
-                  <StatusBadge status={p.status} />
-                </TableCell>
-                <TableCell className="flex flex-wrap justify-end gap-2">
-                  <Button
-                    render={<Link href={`/dashboard/pendonor/kuesioner/${p._id}`} />}
-                    variant="ghost"
-                    size="sm"
-                  >
-                    Kuesioner
-                  </Button>
-                  {p.wawancara && (
+            {partisipasiList.map((p) => {
+              const kantong = kantongByPartisipasi[p._id?.toString()];
+              return (
+                <TableRow key={p._id}>
+                  <TableCell className="font-medium">{p.kegiatanId?.judul}</TableCell>
+                  <TableCell>
+                    {new Date(p.kegiatanId?.tanggalMulai).toLocaleDateString("id-ID")}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={p.status} />
+                  </TableCell>
+                  <TableCell>
+                    {kantong ? (
+                      <span className="font-mono text-xs text-muted-foreground">
+                        {kantong.nomorKantong}
+                      </span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="flex flex-wrap justify-end gap-2">
                     <Button
-                      render={<Link href={`/dashboard/pendonor/wawancara/${p._id}`} />}
+                      render={<Link href={`/dashboard/pendonor/kuesioner/${p._id}`} />}
                       variant="ghost"
                       size="sm"
                     >
-                      Wawancara
+                      Kuesioner
                     </Button>
-                  )}
-                  {p.status === "menunggu_checkin" && (
-                    <CancelPartisipasiButton partisipasiId={p._id.toString()} />
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+                    {p.wawancara && (
+                      <Button
+                        render={<Link href={`/dashboard/pendonor/wawancara/${p._id}`} />}
+                        variant="ghost"
+                        size="sm"
+                      >
+                        Wawancara
+                      </Button>
+                    )}
+                    {p.status === "menunggu_checkin" && (
+                      <CancelPartisipasiButton partisipasiId={p._id.toString()} />
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       )}

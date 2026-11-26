@@ -18,6 +18,7 @@ export async function adjustStokDarah({
   delta,
   alasan,
   refId,
+  kantongId,
   actorId,
   session,
 }) {
@@ -37,7 +38,7 @@ export async function adjustStokDarah({
   }
 
   await StokDarahLog.create(
-    [{ cabangId, golonganDarah, komponenDarah, delta, alasan, refId, actorId }],
+    [{ cabangId, golonganDarah, komponenDarah, delta, alasan, refId, kantongId: kantongId ?? null, actorId }],
     { session },
   );
 
