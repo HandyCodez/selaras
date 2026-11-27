@@ -3,21 +3,14 @@ import { GOLONGAN_DARAH } from "../blood-types.js";
 import { KOMPONEN_DARAH } from "../blood-components.js";
 
 // Generates a unique bag number in the format SEL-YYYYMMDD-XXXXX.
-// Uses a padded random suffix — the combination of date + random is
-// collision-resistant for the volumes a typical PMI branch handles, and
-// avoids the need for a separate auto-increment counter document.
 function generateNomorKantong() {
   const now = new Date();
-  const date = now
-    .toISOString()
-    .slice(0, 10)
-    .replace(/-/g, "");
+  const date = now.toISOString().slice(0, 10).replace(/-/g, "");
   const suffix = Math.floor(10000 + Math.random() * 90000);
   return `SEL-${date}-${suffix}`;
 }
 
-// Expiry durations (days) per blood component, based on standard PMI / WHO
-// guidelines. WB is 35 days (CPD-A anticoagulant), other components vary.
+// Expiry durations (days) per blood component, based on standard PMI / WHO guidelines.
 const EXPIRY_DAYS = {
   WB: 35,
   PRC: 35,
@@ -74,20 +67,41 @@ const KantongDarahSchema = new mongoose.Schema(
     tanggalDonor: { type: Date, required: true },
     tanggalKadaluarsa: { type: Date, required: true },
 
+    // Full lifecycle:
+    // tersedia → dialokasikan → dalam_pengiriman → diterima_rs → digunakan
+    // Side exits: dikembalikan, kadaluarsa, dibuang
     status: {
       type: String,
-      enum: ["tersedia", "terpakai", "kadaluarsa", "dibuang"],
+      enum: [
+        "tersedia",
+        "dialokasikan",
+        "dalam_pengiriman",
+        "diterima_rs",
+        "digunakan",
+        "dikembalikan",
+        "kadaluarsa",
+        "dibuang",
+      ],
       default: "tersedia",
       index: true,
     },
 
-    // Filled when the bag is used to fulfil a blood request (permintaan).
+    // Filled when allocated to a blood request.
     permintaanId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "PermintaanDarah",
       default: null,
     },
+    // Filled when included in a shipment.
+    pengirimanId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "PengirimanDarah",
+      default: null,
+    },
     usedAt: { type: Date, default: null },
+    diterimaPadaTanggal: { type: Date, default: null },
+    digunakanPadaTanggal: { type: Date, default: null },
+    catatanRS: { type: String, default: "" },
   },
   { timestamps: true },
 );

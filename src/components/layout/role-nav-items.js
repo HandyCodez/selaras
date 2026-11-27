@@ -15,6 +15,8 @@ import {
   Building2Icon,
   UsersIcon,
   UserRoundSearchIcon,
+  TruckIcon,
+  ReceiptTextIcon,
 } from "lucide-react";
 
 export const NAV_ITEMS = {
@@ -36,6 +38,7 @@ export const NAV_ITEMS = {
     { href: "/dashboard/petugas/wawancara", label: "Wawancara Medis", icon: StethoscopeIcon },
     { href: "/dashboard/petugas/pendonor", label: "Data Pendonor", icon: UserRoundSearchIcon },
     { href: "/dashboard/petugas/permintaan", label: "Permintaan Darah", icon: ClipboardListIcon },
+    { href: "/dashboard/petugas/pengiriman", label: "Pengiriman Darah", icon: TruckIcon },
     { href: "/dashboard/petugas/stok", label: "Stok Darah", icon: DropletIcon },
     { href: "/dashboard/petugas/berita", label: "Kelola Berita", icon: NewspaperIcon },
     { href: "/dashboard/petugas/akun", label: "Akun Saya", icon: UserRoundIcon },
@@ -43,6 +46,8 @@ export const NAV_ITEMS = {
   rumah_sakit: [
     { href: "/dashboard/rumah-sakit", label: "Beranda", icon: LayoutDashboardIcon },
     { href: "/dashboard/rumah-sakit/permintaan", label: "Permintaan Darah", icon: ScanLineIcon },
+    { href: "/dashboard/rumah-sakit/pengiriman", label: "Pengiriman Masuk", icon: TruckIcon },
+    { href: "/dashboard/rumah-sakit/pembayaran", label: "Tagihan BPPD", icon: ReceiptTextIcon },
     { href: "/dashboard/rumah-sakit/stok", label: "Stok Darah", icon: DropletIcon },
     { href: "/dashboard/rumah-sakit/akun", label: "Akun Saya", icon: UserRoundIcon },
   ],
